@@ -319,6 +319,55 @@ The original work introduced variants based on different distance metrics, inclu
 The effectiveness of the C\&W attack also demonstrated weaknesses in several proposed defenses. In particular, it was shown to successfully bypass defense distillation \cite{papernot2016distillation}, a technique proposed to improve adversarial robustness by training a model using softened output probabilities from a teacher network. Although defense distillation appeared to increase resistance against earlier attacks, Carlini and Wagner demonstrated that the defense distillation method did in fact only obscure the model's gradient albeit not truly hiding it \todo{So what? How is this relevant? elaborate maybe}. By directly targetting the logit with their loss function, Carlini et al. were able to efficiently generate adversarial examples in spite of defense distillation by directly approximating the obscured decision boundary.
 %\end{comment}
 
+\subsubsection{Transfer Attacks}
+In a transfer attack, an adversary first obtains a substitute model that he has full access to as a stand-in for a target black-box model. On this substitute, white-box attacks can be performed to find adversarial examples. Since they generally transfer from one model to another, these can then be used to attack the actual target model.
+
+\subsubsection{Jacobian-based dataset augmentation}
+Papernot et al. \cite{papernot2017practical} introduced black-box attacks via transfer attacks where neither target model parameters nor a suitable data set is accessible to the attacker. Prior work by Biggio et al \cite{biggio2013evasion} had introduced transfer attacks already, but granted access to such a dataset.
+
+First, the substitute architecture is defined based on input and output of the target, e.g. one adapted to images. The architecture is overall not a deciding factor in the success of this approach.
+
+The dataset restriction poses a difficulty for training the substitute. Papernot et al. solve this by querying the target on artificial data points to create a substitute dataset. Here, the selection of good data points to learn similar decision boundaries is crucial: a bad crafting strategy would require infeasible and highly suspicious amounts of queries to the target model. In particular, generation based on random noise does not work.
+
+Instead, they rely on a heuristic to find out in which input direction the (substitute!) model's output changes and adding new samples focused on these directions. For that, they rely on the substitute model's Jacobian matrix (multidimensional derivative, each entry is one output coordinate partially derived by an input coordinate) at input points.
+
+They start by collecting a set of samples somewhat representative of the target's input domain, such as different natural images.
+Next, an architecture is selected.
+
+The following steps are then performed repeatedly: The adversary makes the target model label his current selection of samples, and then trains his substitute with the new examples. Then, he augments his dataset with additional input points.
+
+Let \(J_f(x)\) be the Jacobian of the substitute at a point x. Then, \(J_f(x)[o(x)]\) is the column corresponding to partial derivatives of the correct label (i.e. the one assigned by the target model). Papernot et al. now add the sign of this column scaled by a factor \(\lambda\) to point x: \(x = x + \lambda sign(J_f(x)[o(x)]\), and add it to their dataset.
+
+By doing this to all current points, they obtain a larger sample set, so the model trained in the next iteration is closer to the target. Note that every epoch, the model is trained from scratch. With enough iterations, the substitute can then be used to generate the adversarial examples.
+% !!! check Jacobian definition
+
+\subsubsection{Ensemble Attacks}
+To improve transferability of adversarial examples created on substitute models, Liu et al. \cite{liu2016delving} argue that an adversarial example that works well for multiple models at the same time is bound to transfer better than one that only works on a single one.
+
+That's why they propose that an adversary in the transfer attack setting crafts adversarial examples against an ensemble of models. For a targeted attack, they suggest the negative-log-likelihood-objective:
+
+\[
+x^{*} = \arg\min_{x'}{-\log((\sum_{i=1}^k \alpha_i J_i(x'))*\mathbb{1}_{y^{*}}) + \lambda \lVert x - x'\rVert}
+\]
+where \(J(*)\) is each models output, \(\alpha_i\) scaling factors for each such that \(\sum_i\alpha_i=1\), for example simply \(1/k\).
+
+\subsubsection{MI-FGSM and Momentum}
+Kurakin et al. \cite{kurakin2016adversarial} remarked that, while iterative methods yield better results on a single attacked white-box model, single-step methods exhibit better transferability. They suspected that iterative methods overfit to parameters of the model.
+
+To tackle this issue, Dong et al. \cite{dong2018boosting} proposed adding momentum to iterative methods such as iterative FGSM, leading to momentum iterative FGSM. This way, both the underfitting of basic FGSM as well as the overfitting of iterative FGSM is easened.
+
+The gradient is updated as
+\[
+g_{t+1} = \mu * g_t + \frac{\nabla_x J(x_t^{*}, y)}{\lVert \nabla_x J(x_t^{*}, y) \rVert_1}
+\]
+with \(\mu\) being the decay factor and the gradient being normalized to handle gradient magnitudes varying over iterations.
+
+Accordingly, the sample is updated as
+
+For \(\mu=0\), this goes back to being normal FGSM. Note that this change is not restricted to FGSM, but can be applied to any iterative gradient-based method including targeted ones.
+
+Additionally, they also suggest a variety of ensemble types ...
+
 \subsubsection{ZOO (draft!)}
 Zeroth-Order Black Box Attacks (ZOO) \cite{chen2017zoo}
 In 2017, Chen et al. \cite{chen2017zoo} proposed Zeroth-Order Black Box Attacks (ZOO), a black-box attack without the use of a substitute model. This way, they avoided losses in transferability to the target and achieved comparable \todo{elaborate} results to then-state of the art white box attacks.
@@ -451,7 +500,7 @@ While training the surrogate model on both \(D_{POOD}\) and \(D_t\) simultaneous
 In the second step, they use (stochastic) projected gradient descent to find the trigger \(\delta^{*}\) and subsequently add it to a portion of the target class samples \(D_t\).
 The victim is then given this poisoned target class data set.
 
-In a backdoor exploit, the adversary can amplify the trigger to 
+In an eventual exploit, the adversary adds the trigger to the desired input. It is an option to amplify the trigger to increase attack success rates.
 % !!! NArcissus - Zeng et al. \cite{zeng2023narcissus} 
 
 % !!! all to one / one to one discussion??
