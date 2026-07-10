@@ -221,12 +221,13 @@ Unlike L-BGFS, they did not choose a specific target class they want the adversa
 \[\arg\max_{x' s.t. \lvert \lvert x'-x \rvert \rvert_\infty \leq \delta} L(\theta, x', y) = x + \arg\max_{\lvert\lvert\eta\rvert\rvert_\infty\leq\delta}L(\theta, x+\eta, y)\]
 
 given a data point \(x\), a limit \(\delta\), and a loss function \(L(\theta, x, y)\), to find the 'worst' adversarial example (maximizes loss) in the $L_\infty$-ball around $x$
-\todo{cost vs loss function?? Rewrite without x', but with epsilon?}
+%\todo{cost vs loss function?? Rewrite without x', but with epsilon?}
 
 To do that, Goodfellow et al. linearize the loss function around $x$, giving us 
 
 \[
-\arg\max_{\lvert\lvert\eta\rvert\rvert_\infty\leq\delta}L(\theta, x+\eta, y) = \arg\max_{\lvert\lvert\eta\rvert\rvert_\infty\leq\delta}L(\theta, x, y) + \nabla_x L(\theta, x, y)^T \eta =
+\arg\max_{\lvert\lvert\eta\rvert\rvert_\infty\leq\delta}L(\theta, x+\eta, y) = 
+\arg\max_{\lvert\lvert\eta\rvert\rvert_\infty\leq\delta}L(\theta, x, y) + \nabla_x L(\theta, x, y)^T \eta =
 \arg\max_{\lvert\lvert\eta\rvert\rvert_\infty\leq\delta}\nabla_x L(\theta, x, y)^T \eta
 \]
 %\[\max_{x' s.t. \lvert \lvert x'-x \rvert \rvert_\infty \leq \delta} L(\theta, x', y) = \max_{x' s.t. \lvert \lvert x'-x \rvert \rvert_\infty \leq \delta} L(\theta, x, y) + \nabla_x L(\theta, x, y)^T (x'-x) =L(\theta, x, y)\max_{\lvert\lvert\eta\rvert\rvert_\infty\leq\delta}\]%\[= \arg\max_{x' s.t. \lvert \lvert x'-x \rvert \rvert_\infty \leq \delta} \nabla_x L(\theta, x, y)^T x'\]
@@ -240,12 +241,12 @@ We can easily see that $\eta = \delta \cdot sign(\nabla_x L(\theta, x, y))$ is a
 %Maximizing ||x-x'||... gives us x_adv = ...
 
 %This yielded good experimental results [cite], though later literature [cite PGD] improved results by not linearizing the cost function as strictly.
-The method also yielded good results... \todo{"good"??} but worse than L-BGFS (cite DVERSARIAL MACHINE LEARNING AT SCALE)
+%The method also yielded good results... \todo{"good"??} but worse than L-BGFS (cite DVERSARIAL MACHINE LEARNING AT SCALE)
 
-Since this approach only needs one backpropagation step instead of iterations like L-BGFS algorithm run, this was called the Fast Gradient Sign Method [find source again, was in one of them]. It made adversarial training feasible, which aims to improve a model's robustness by inserting adversarial examples into the training set.
+Since this approach only needs one backpropagation step instead of iterations like L-BGFS algorithm run, this was called the Fast Gradient Sign Method. It made adversarial training feasible, which aims to improve a model's robustness by inserting adversarial examples into the training set.
 
 \subsubsection{Variants of FGSM}
-\todo{One-step target class meths, cf DVERSARIAL MACHINE LEARNING AT SCALE}
+%\todo{One-step target class meths, cf DVERSARIAL MACHINE LEARNING AT SCALE}
 
 Different variants of FGSM were proposed. \cite{kurakin2017physical}, later \cite{kurakin2017scale}.
 
@@ -261,30 +262,34 @@ where \(Clip_{X,\epsilon}\) implements pixel-wise constriction to the \(\epsilon
 
 To find adversarial examples of a specific class \(y_{target}\) instead of maximizing the loss function, FGSM can be modified to maximize that classes probability \(p(y_{target} | X)\). This can be achieved with a single step in direction of \(sign(\nabla_X log(p(y_{target} | X)))\) \cite{kurakin2017physical}
 %loss function formulation for Crossentropy
-, analogous to basic FGSM, or using multiple, like in the aforementioned basic iterative method \cite{kurakin2017scale}. A popular choice for target class is the one originally deemed least likely by the target model. [!!!] 
+, analogous to basic FGSM, or using multiple, like in the aforementioned basic iterative method \cite{kurakin2017scale}. A popular choice for target class is the one originally deemed least likely by the target model.% [!!!] 
 
 
 
 
-\subsubsection{PGD (draft! include more predecessors?)} \label{PGD}
+\subsubsection{PGD} \label{PGD}
 %Like FGSM, adversarial attacks using projected gradient descent (PGD) as proposed by Madry et al. \cite{madry2017towards} use first-order information, i.e. the gradient of the loss function, but extend it to ... 
-Searching adversarial examples by using projected gradient descent (PGD) as proposed by Madry et al. \cite{madry2017towards} is similar to the basic iterative method. Both use first-order information (!!!mention earlier), i.e. the gradient of the loss function, to iteratively maximize the loss on an input in the neighborhood of the real image. %!!! this shit is so ass
-Instead of using multiple FGSM steps, though, Madry et al. use projected gradient descent directly. % ass ass
+Searching adversarial examples by using projected gradient descent (PGD) as proposed by Madry et al. \cite{madry2017towards} is similar to the basic iterative method. Both use first-order information, i.e. the gradient of the loss function, to iteratively maximize the loss on an input in the neighborhood of the real image.
+Instead of using multiple FGSM steps, though, Madry et al. use projected gradient descent directly. 
 
-[They] formulate the adversary's goal as.... \todo{include the dual formulation? Not that important for adv. attacks?} Note that the formulation by [FGSM guys] is encompassed in this, by using S=..., then linearizing this maximization problem ... [They] argue that this is insufficient to solve the optimization problem and instead employ PGD to find local maxima in the $L_\infty$ ball. Instead of the single step in gradient direction used in FGSM, we get multiple.
+They formulate the adversary's goal as.... 
+\[
+\max_{\eta\in S}L(\theta, x+\eta, y)
+\]
+%\todo{include the dual formulation? Not that important for adv. attacks?} 
+Note the similarities to FGSM, by using \(S={\eta \vert \lVert \eta \rVert \leq \delta}\), we obtain its maximization problem. FGSM is therefore a specific method to tackle this general formulation.
 
-[They] argue that [plateau, maxima], so [it is a good attack]
+As a generalized, stronger attack, they propose using PGD. They support their argument with an experiment, starting PGD starting from random points in the vicinity of \(x\). While many different local maxima are found, they have roughly the same loss value. If an even better maximum existed, the argue it would be hard to find with any first-order method. Therefore, no other first-order method could find it in reasonable time either, making PGD a useful "universal" first-order adversary.
 
-First-order adversary discussion?
+However, this strength has a caveat. As we will see in later sections \ref{sssec:momentum}, not every adversarial example corresponding to a local minimum is equally transferable to other models.
 
-
-This also ties into adversarial training [dual formula]..?
--saddle point formulation (into theory part??) -> adversary goal, L norm flexibility, FGSM as special case
+%This also ties into adversarial training [dual formula]..?
+%-saddle point formulation (into theory part??) -> adversary goal, L norm flexibility, FGSM as special case
 
 %others 
 %ADVERSARIAL MACHINE LEARNING AT SCALE, e.g. basic iterative meth, One-step target class methods!!
 
-%[Deepfool - commented out for compilation speed]
+
 %\begin{comment}
 \subsubsection{DeepFool}
  DeepFool was introduced by Moosavi-Dezfooli et al.~\cite{moosavi2016deepfool} in 2016. The central idea of this iterative is to characterize adversarial vulnerability geometrically: rather than loosely optimizing an attack loss, DeepFool estimates the distance of an input to the closest decision boundary. For affine classifiers, this distance could be calculated in a closed form by projecting the input point onto the decision hyperplane. The highly nonlinear decision boundaries of deep neural networks are addressed by DeepFool by exploiting the observation that although the true boundary of a neural network may be highly curved, sufficiently small neighborhoods can often be approximated accurately by a hyperplane; the shortest path to this approximate boundary is assumed to provide a good estimate of the minimal adversarial perturbation. This auxiliary hyperplane is recomputed at each iteration from a first-order Taylor expansion of the classifier around the current point; as the point is repeatedly displaced onto the latest hyperplane, it moves closer and closer to the true, nonlinear decision boundary until it eventually crosses it. In mathematical terms, at an intermediate point $x_i$, the classifier is iteratively replaced by its local linear approximation,                                   
@@ -380,6 +385,7 @@ x^{*} = \arg\min_{x'}{-\log((\sum_{i=1}^k \alpha_i J_i(x'))*\mathbb{1}_{y^{*}}) 
 where \(J(*)\) is each models output, \(\alpha_i\) scaling factors for each such that \(\sum_i\alpha_i=1\), for example simply \(1/k\).
 
 \subsubsection{MI-FGSM and Momentum}
+\label{sssec:momentum}
 Kurakin et al. \cite{kurakin2016adversarial} remarked that, while iterative methods yield better results on a single attacked white-box model, single-step methods exhibit better transferability. They suspected that iterative methods overfit to parameters of the model.
 
 To tackle this issue, Dong et al. \cite{dong2018boosting} proposed adding momentum to iterative methods such as iterative FGSM, leading to momentum iterative FGSM. This way, both the underfitting of basic FGSM as well as the overfitting of iterative FGSM is easened.
@@ -391,16 +397,19 @@ g_{t+1} = \mu * g_t + \frac{\nabla_x J(x_t^{*}, y)}{\lVert \nabla_x J(x_t^{*}, y
 with \(\mu\) being the decay factor and the gradient being normalized to handle gradient magnitudes varying over iterations.
 
 Accordingly, the sample is updated as
-
+\[
+x_{t+1}^{*} = x_t^{*} + \alpha * sign(g_{t+1})
+\]
+\(\alpha\) being the step size.
 For \(\mu=0\), this goes back to being normal FGSM. Note that this change is not restricted to FGSM, but can be applied to any iterative gradient-based method including targeted ones.
 
-Additionally, they also suggest a variety of ensemble types ...
 
-\subsubsection{ZOO (draft!)}
-Zeroth-Order Black Box Attacks (ZOO) \cite{chen2017zoo}
-In 2017, Chen et al. \cite{chen2017zoo} proposed Zeroth-Order Black Box Attacks (ZOO), a black-box attack without the use of a substitute model. This way, they avoided losses in transferability to the target and achieved comparable \todo{elaborate} results to then-state of the art white box attacks.
+\subsubsection{ZOO}
+Zeroth-Order Black Box Attacks (ZOO)
+In 2017, Chen et al. \cite{chen2017zoo} proposed Zeroth-Order Black Box Attacks (ZOO), a black-box attack without the use of a substitute model. This way, they avoided losses in transferability to the target and achieved comparable %\todo{elaborate} 
+results to then-state of the art white box attacks.
 
-This attack is possible if the adversary is allowed to query the target model, i.e. obtaining the function value, here confidence scores, $f(x)$ for an arbitrary $x$. This might be the case for a classification-as-a-service tool. Gradients and model configuration, however, are not available (black box).
+This attack is possible if the adversary is allowed to query the target model, i.e. obtaining the confidence scores, $f(x)$ for an arbitrary $x$. This might be the case for a classification-as-a-service tool. Gradients and model configuration, however, are not available (black box).
 
 To circumvent this restriction, Chen et al. estimate a pseudo-gradient using two queries per coordinate:
 \[
@@ -415,7 +424,8 @@ Instead, Chen et al. perform stochastic coordinate descent, improving just a bat
 
 Still, we need to find a suitable loss function f. In fact, we can use different loss functions to adapt different white-box attacks. In their work, Chen et al. adapted the Carlini-Wagner attack. C-W's loss function performs on the raw logits of a model, an information inaccessible in the black-box case.
 
-Instead, Chen et al. use the logarithm of the confidence scores as a proxy of sorts for the logits \todo{argue} and obtain
+Instead, Chen et al. use the logarithm of the confidence scores as a proxy of sorts for the logits %\todo{argue} 
+and obtain
 \[
 %f(x,t) = \max\left\{ \max_{i\neq t} \log[F(x)]_i - \log[F(x)]_t,-\kappa \right\}
 f(x,t) = \max\{ \max_{i\neq t} \{\log[F(x)]_i\} - \log[F(x)]_t,-\kappa \}
@@ -426,13 +436,13 @@ for targeted attacks and
 f(x,t) = \max\{ \log[F(x)]_{t_0} - \max_{i\neq t_0} \{\log[F(x)]_i\} ,-\kappa \}\}
 \]
 for untargeted ones.
-\todo{mutually improve this with Carlini-Wagner}
+%\todo{mutually improve this with Carlini-Wagner}
 
-Additionally, they propose different measures to speed up optimization even more \todo{...}
+%Additionally, they propose different measures to speed up optimization even more \todo{...}
 
 %In fact, ZOO is more of a technique to adapt white-box attacks, such as Carlini-Wagner, to black-box targets. The downside is longer processing times.% as this adaptation is done using pseudo-gradients estimated from function values.
 
-\todo{Newton method using Hessian, and other tricks}
+%\todo{Newton method using Hessian, and other tricks}
 
 
 
@@ -468,7 +478,7 @@ Backdoor keys may either be a single instance or a pattern added to instances. T
 
 In input-instance-key strategies, Chen et al. propose adding different noised versions of the key-to-be to the training set, each with the chosen label. The idea is to get the model to overfit to these.
 
-Pattern-key strategies are more complex. The adversary can either \todo{cont.}
+In Pattern-key strategies, the adversary can blend a key pattern onto pictures, add an accessory, or blend in an accessory according to Chen et al.'s suggestions. The idea of the blending is to make the pattern harder to spot for humans. In any case, the perturbed sample is added to the dataset as poison. 
 
 Like Gu et al.'s attack, theirs also depends on hyperparameter choices only, with the framework not optimizing poisoning on its own. 
 
@@ -482,8 +492,9 @@ First, he chooses a base instance, such that its class, the "base class", is the
 p = \arg\min_x {\lvert \lvert f(x) - f(t) \rvert \rvert_{2}^2
 + \beta \lvert \lvert x - b \rvert \rvert_{2}^2} 
 \]
-where the first term compares the target t and poison candidates x in feature space (the more similar, the better), and the second penalizes difference from the base instance. The general idea is to find a poison instance close to b, therefore likely to be labeled the same, yet close to t in feature space (output of second-to-last layer), so t is treated the same as b by the model. Shafahi et al. argue that a suitable x can be found due to f being supposedly highly nonlinear. For optimization, two steps are iterated: First, a gradient step ("forward step"), then a step towards b ("backwards step").
-\todo{FAIL graphic - similar}
+where the first term compares the target t and poison candidates x in feature space (the more similar, the better), and the second penalizes difference from the base instance. The general idea is to find a poison instance close to b, therefore likely to be labeled the same, yet close to t in feature space (output of second-to-last layer), so t is treated the same as b by the model. %Shafahi et al. argue that a suitable x can be found due to f being supposedly highly nonlinear. 
+For optimization, two steps are iterated: First, a gradient step ("forward step"), then a step towards b ("backwards step").
+%\todo{FAIL graphic - similar}
 
 \subsubsection{Clean-label backdoor attacks}
 Saha et al. \cite{saha2020hidden}
@@ -501,7 +512,7 @@ Let \(\tilde{s}\) be the patched source, \(t\) the target, and \(\epsilon\) a sm
 \]
 to obtain the poisoned sample x. Again, \(f\) is the output of the second-to-last layer, the feature space representation.
 % !!! go more in detail about this look on NNs: "only last layer decides"?
-To optimize, they use projected gradient descent (\ref{PGD}). However, in each optimization step, a new randomly-patched source is selected so the backdoor generalizes to arbitrary images and patch placements. ...% !!! ... multiple at once, 1:1 problem
+To optimize, they use projected gradient descent (\ref{PGD}). However, in each optimization step, a new randomly-patched source is selected so the backdoor generalizes to arbitrary images and patch placements. %...% !!! ... multiple at once, 1:1 problem
 
 %Narcissus, Label-consistent
 A more recent work by Zeng et al. \cite{zeng2023narcissus} addresses issues with prior work on clean-label backdoor attacks. % !!! which ones
