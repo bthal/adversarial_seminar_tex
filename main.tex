@@ -34,19 +34,17 @@
 
 \maketitle
 \section{Introduction}
-Neural Networks ...
-\begin{itemize}
-\item what are they
-\item general robustness problem/
-\item descr. of adv. examples, ...? !Combine with early adv. history
-%\item pioneer/early work on ML/deep learning safety (brief)
-\item relevance
-\item structure of this report
-\end{itemize}
+\label{sec:intro}
 
-[BRIEF neural network + backpropagation introduction?]
+Over the past decade, deep neural networks have become the dominant approach to a broad range of perception tasks from image classification and speech recognition to natural language understanding in many cases matching or surpassing human performance on standard benchmarks.\cite{lecun2015deep, he2015delving} On the strength of these results, such models are increasingly deployed in consequential, safety-relevant settings, including autonomous driving,\cite{grigorescu2020survey} biometric identification,\cite{schroff2015facenet} and automated content moderation.\cite{gorwa2020algorithmic}
 
-In deep learning, networks with many layers are used to solve tasks, such as image classification, in which we call the network the classifier.
+This success, however, rests on a surprisingly fragile foundation. In 2013, Szegedy et al.\ \cite{szegedy2013intriguing} showed that state-of-the-art classifiers can be fooled by \textit{adversarial examples}: inputs altered by a perturbation so small that it is imperceptible to a human, yet enough to make the model produce a confident but incorrect prediction. The most widely known illustration adds a small, carefully produced pertubation to a photograph of a panda and leads a high-accuracy network to confidently label it as a gibbon (Figure~\ref{fig:panda_gibbon}). Such examples are neither rare accidents nor quirks of a single model: the same perturbed input frequently fools different architectures trained on different data, and the vulnerability appears across essentially all kinds of machine learners.\cite{goodfellow2014explaining, biggio2018wild}
+
+In this paper, we are examining closely, not only how the properties of adversarial attacks where unravelled as different strategies to systematically and efficiently produce adversarial systems. We also turn to the question of how the topic of adversarial attacks shaped the discussion on \textit{robustness} in the machine learning domain in general. We come to the conclusion that adversarial examples have fundamentally reshaped how computer scientists think about machine learning models: they demonstrate that high test accuracy does not imply that a network has grasped the concepts a human would, and they expose a fascinating mismatch between human and machine perception. \textit{Robustness} has thus become a property that must be explicitly defined, demanded, and asserted.\cite{hendrycks2019benchmarking}
+
+This report is intended as a broad introduction to the topic. In our examination of specific attack methods, we thus concentrate on the classical setting of evasion and poisoning attacks against image classifiers, surveying the ideas and methods that have shaped the research area.
+
+The rest of the report is organised as follows. Section~\ref{sec:attacks} defines adversarial examples precisely, introduces a taxonomy that classifies attacks along four orthogonal dimensions, and reviews the most influential evasion and poisoning attacks. Section~\ref{sec:discussion} then contains our discussion: the pertinence of adversarial attacks in the real and physical world, the competing attempts to explain why adversarial examples exist in the first place, and a reflection on what makes the phenomenon a worthwhile object of study.
 
 
 
@@ -75,7 +73,7 @@ The requirement that perturbations are \textit{intentional} reflects the modern 
 \paragraph{Subtle and Imperceptible Perturbations.}
 The notion of \textit{subtle} perturbations can be interpreted in two related but distinct ways. First, adversarial perturbations are commonly constrained to be mathematically small according to a chosen distance metric. The most frequently used measures are the $L_0$ norm, which counts the number of modified features or pixels; the $L_2$ norm, which measures the Euclidean distance between the original and perturbed inputs; and the $L_\infty$ norm, which limits the maximum change applied to any individual feature.\cite{costa2024deep} These norms define the perturbation budget available to an adversary and provide a mathematical notion of similarity between inputs. We will discuss these different norms in more detail in subsubsection~\ref{sssec:norms}.
 
-Second, perturbations are often required to be imperceptible to humans. In the image domain, this means that the perturbed input should be visually indistinguishable or at least hardly distinguishable from the original image, preserving its semantic meaning.\cite{madry2017towards,moosavi2016deepfool} Although we rarely see the perceptibility of the applied perturbations rigorously validated—for example, through experiments with human subjects or using LPIPS\cite{zhang2018unreasonable} as a proxy metric—it is nevertheless very common for authors to state, based on a visual assessment, that the adversarial examples they have generated are indistinguishable from the original to humans.\cite{brendel2017decision, chakraborty2018adversarial, costa2024deep, liang2022adversarial, papernot2016distillation, papernot2016transferability}
+Second, perturbations are often required to be imperceptible to humans. In the image domain, this means that the perturbed input should be visually indistinguishable or at least hardly distinguishable from the original image, preserving its semantic meaning.\cite{madry2017towards,moosavi2016deepfool} Although we rarely see the perceptibility of the applied perturbations rigorously validated it is nevertheless very common for authors to state, based on a visual assessment, that the adversarial examples they have generated are indistinguishable from the original to humans.\cite{brendel2017decision, chakraborty2018adversarial, costa2024deep, liang2022adversarial, papernot2016distillation, papernot2016transferability}
 
 \paragraph{Confidence of Misclassification.}
 Some definitions additionally require adversarial examples to induce misclassifications with high confidence.\cite{madry2017towards} In practice, however, high-confidence errors are often a consequence of the optimization objective used during adversarial example generation rather than a defining characteristic of adversarial examples themselves. For example, early optimization-based attacks explicitly maximize the model loss or the probability assigned to a target class.\cite{szegedy2013intriguing} Consequently, contemporary literature generally treats high confidence as an attack objective rather than a necessary component of the definition.
@@ -121,10 +119,6 @@ Targeted attacks seek to force the model to produce a specific attacker-chosen o
 
 \paragraph{Untargeted Attacks.}
 Untargeted attacks aim only to cause a prediction error, but do not specify the resulting incorrect class. The attack is therefore successful as soon as the model's prediction differs from the correct label. The attacker might aim at having the classifier recognize the image as showing anything but a panda.
-% !!! THis can lead to "uninteresting" predictions, cf. that one FGSM variant paper
-
-\paragraph{Confidence Reduction Attacks.}
-Rather than inducing a specific misclassification, confidence reduction attacks aim to decrease the model's confidence in its predictions. Such attacks may not necessarily change the predicted class but instead increase uncertainty or reduce the probability assigned to the correct label. These attacks are particularly relevant in safety-critical applications, where confidence estimates are used to support downstream decision-making. By lowering confidence, an attacker may trigger fallback mechanisms, human intervention, or rejection of otherwise valid inputs.
 
 \subsubsection{By Perturbation Constraint}
 \label{sssec:norms}
@@ -616,6 +610,14 @@ The linear view also provided the first explanation of transferability. Since ad
 
 \paragraph{The Fundamental Mismatch}
 Ilyas et al.~\cite{ilyas2019adversarial} shift the framing once more, reframing adversarial examples not as pathological failures but as a \textit{mismatch between machine and human perception}: models exploit patterns that are genuinely predictive, but imperceptible to, and unintuitive for, humans. They distinguish \textit{predictive} features (features correlated with the label) from \textit{robust} features (features that remain predictive under perturbation). Since \textit{empirical risk minimisation} rewards any signal that improves accuracy, a learner will readily rely on predictive but non-robust features; adversarial vulnerability is then an expected consequence of standard training, rooted in the gap between the human sense of similarity and the statistical structure of the data. A striking experiment makes this concrete: they relabel every image of CIFAR-10 with a new, random target class and perturb it so that a model reads the new label, while to a human the images appear unchanged and hence entirely mislabelled. A standard model trained on this dataset nevertheless generalises well to the \textit{clean}, unmodified test set---evidence that it has latched onto real, transferable features that merely happen to be imperceptible to us. This view also bears on interpretability: if a model succeeds by relying on human-imperceptible features, there may be little in its decisions for a human to understand.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\linewidth]{adversarial_dataset}
+	\caption{}
+	\label{fig:adversarialdataset}
+\end{figure}
+
 
 \subsection{Pertinence of Adversarial Examples as a Subject Area}
 
