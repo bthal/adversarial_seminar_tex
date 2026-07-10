@@ -81,6 +81,7 @@ Second, perturbations are often required to be imperceptible to humans. In the i
 Some definitions additionally require adversarial examples to induce misclassifications with high confidence.\cite{madry2017towards} In practice, however, high-confidence errors are often a consequence of the optimization objective used during adversarial example generation rather than a defining characteristic of adversarial examples themselves. For example, early optimization-based attacks explicitly maximize the model loss or the probability assigned to a target class.\cite{szegedy2013intriguing} Consequently, contemporary literature generally treats high confidence as an attack objective rather than a necessary component of the definition.
 
 \subsection{Taxonomy}
+\label{sec:taxonomy}
 
 Adversarial attacks can be categorised according to several orthogonal dimensions, including the attacker's knowledge of the target model, the stage at which the attack is performed, the attacker's objective, and the constraint that bounds the perturbation. These dimensions are widely used throughout the literature and provide a useful framework for comparing attack methodologies.\cite{pitropakis2019taxonomy,costa2024deep} Figure~\ref{fig:taxonomy} summarises these four dimensions together with their possible values; the attacks discussed in this survey are classified according to this taxonomy, with a complete overview provided in Table~\ref{table_with_all_attacks}.
 
@@ -162,7 +163,32 @@ On the contrary, models like RBF did not seem as vulnerable to adversarial examp
 More detailed papers like [Adversarial examples are not bugs, they are features] -> Is it even possible to have networks not vulnerable to adversarial examples?
 
 \subsection{Notable Evasion Attacks}
-This section presents several notable adversarial attacks that have significantly influenced the development of adversarial machine learning. An overview of these attacks, together with their classification according to the taxonomy introduced in Section~\ref{sec}, is provided in Table~\ref{table_with_all_attacks}.
+This section presents several notable adversarial attacks that have significantly influenced the development of adversarial machine learning. An overview of these attacks, together with their classification according to the taxonomy introduced in Section~\ref{sec:taxonomy}, is provided in Table~\ref{table_with_all_attacks}.
+
+\begin{table}[t]
+\centering
+\caption{Overview of the attacks discussed in this survey, classified along the four dimensions of the taxonomy in Section~\ref{sec:taxonomy}. ``Both'' marks attacks with widely used targeted and untargeted variants; ``--'' marks poisoning attacks for which an input-space norm budget does not directly apply.}
+\label{table_with_all_attacks}
+\small
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Attack & Knowledge & Stage & Goal & Constraint \\
+\midrule
+L-BFGS~\cite{szegedy2013intriguing}                     & White-box & Evasion   & Targeted   & $L_2$ \\
+FGSM~\cite{goodfellow2014explaining}                    & White-box & Evasion   & Untargeted & $L_\infty$ \\
+BIM / iterative~\cite{kurakin2017physical}              & White-box & Evasion   & Both       & $L_\infty$ \\
+PGD~\cite{madry2017towards}                             & White-box & Evasion   & Untargeted & $L_\infty$ \\
+DeepFool~\cite{moosavi2016deepfool}                     & White-box & Evasion   & Untargeted & $L_2$ \\
+Carlini--Wagner~\cite{carlini2017towards}               & White-box & Evasion   & Targeted   & $L_0/L_2/L_\infty$ \\
+ZOO~\cite{chen2017zoo}                                  & Black-box & Evasion   & Both       & $L_2$ \\
+BadNets~\cite{gu2017badnets}                            & White-box & Poisoning & Targeted   & -- \\
+Targeted backdoor~\cite{chen2017targeted}               & Black-box & Poisoning & Targeted   & -- \\
+Poison Frogs~\cite{shafahi2018poison}                   & White-box & Poisoning & Targeted   & -- \\
+Clean-label backdoor~\cite{turner2019label,saha2020hidden} & White-box & Poisoning & Targeted & -- \\
+Narcissus~\cite{zeng2023narcissus}                      & Black-box & Poisoning & Targeted   & $L_\infty$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsubsection{L-BFGS}
 The first widely recognised adversarial attack was introduced by Szegedy et al.~\cite{szegedy2013intriguing}. Their work did not only show that machine learning models are vulnerable to inputs that lead to incorrect predictions while appearing unchanged to human observers, first describing the phenomenon of an adversarial example. They further introduced a fairly reliable method to find such examples.
@@ -524,7 +550,7 @@ In an eventual exploit, the adversary adds the trigger to the desired input. It 
 \section{Discussion}
 \subsection{Real-World and Physical Adversarial Attacks}
 
-Somewhat surprisingly, in practice, confirmed \textit{malicious} adversarial-example attacks against real institutions or individuals remain strikingly rare.\cite{biggio2018wild, raff2023dont} Two explanations suggest themselves. 
+Somewhat surprisingly, in practice, confirmed \textit{malicious} adversarial-example attacks against real institutions or individuals remain strikingly rare.\cite{biggio2018wild, raff2023dont} Two explanations seem possible. 
 
 \begin{enumerate}
 	\item Adversarial attacks slip through unnoticed: a successful adversarial input may be logged as an ordinary misclassification, be considered a generic model error, or filed under an unrelated incident category, so that successfull employed adversarial attacks fly under the radar.
@@ -534,6 +560,17 @@ Somewhat surprisingly, in practice, confirmed \textit{malicious} adversarial-exa
  The second explanation is the one that we consider to be more plausible.  Building an adversarial example to defeat a system that a simpler attack would already defeat is like learning to pick a lock when the crowbar is cheaper, quicker, and works just as well. Interestingly, the few confirmed real-world cases, such as commercial CAPTCHA-solving services or the prompt injection of deployed chatbots, tend to be those where no such simpler alternative exists.
 
 This does not render the phenomenon academic in the pejorative sense. As machine learning is embedded ever more deeply into the physical world---autonomous vehicles, automated border control, biometric surveillance---the question of whether an input that is semantically unchanged to a human can nonetheless fool a sensor pipeline becomes a central engineering concern. The body of work on \textit{physical} adversarial attacks shows that it can: inconspicuous stickers on a stop sign reliably cause targeted misclassification, both in the laboratory and from a moving vehicle;\cite{eykholt2018robust} printable adversarial patches force a chosen label onto almost any scene they appear in;\cite{brown2017adversarial} adversarial eyeglass frames defeat face recognition;\cite{sharif2016accessorize} and spoofed sensor returns or crafted road-surface markings can mislead the perception stack of a production self-driving system.\cite{cao2019adversarial, tencent2019tesla}
+
+\begin{figure}[t]
+	\centering
+	\subcaptionbox{A 3D-printed turtle tha tis consistently misclassified as a rifle. Reproduced from \cite{athalye2018synthesizing}\label{fig:adversarialturtle}}{\includegraphics[height=2.7cm]{deepfool_multiclass_linear_approximation1}}\hfill
+	\subcaptionbox{Perturbed sign fooling a real car to be read as a 30 speed limit sign. Reproduced from \cite{morgulis2019fooling}\label{fig:adversarialtrafficsign}}{\includegraphics[height=2.7cm]{adversarial_traffic_sign}}\hfill
+	\subcaptionbox{A pertubed logo to be recognized as a \textit{No overtaking} sign. Reproduced from \cite{sitawarin2018darts}\label{fig:adversariallogo}}{\includegraphics[height=2.7cm]{adversarial_logo}}
+	\caption{Examples of physical-world adversarial attacks that survive the transition through a camera or sensor.}
+	\label{fig:physical}
+\end{figure}
+
+
 
 Such results matter because robustness is a core requirement for any safety-relevant deployment---which makes it all the more pressing to understand \textit{why} such systems fail, and what that failure implies. It is to those questions that we are discussing more closely in the following section.
 
@@ -566,7 +603,7 @@ This point is easily overstated, and often is: Goodfellow et al.\ do not claim t
 
 The linear view also provided the first explanation of transferability. Since adversarial examples now occupy broad, contiguous half-spaces rather than fine pockets, different models' adversarial regions overlap heavily, which explains why an example crafted for one model tends to fool another at all. And because the discriminative direction is largely a property of the data rather than of the model, models trained on the same task tend to learn similar weight vectors, so that the same perturbation pushes them toward the same incorrect class---which explains why the models tend to agree on that class. 
 
-\paragraph{Ilyas et al.\ (2019): features, not bugs.}
+\paragraph{The Fundamental Mismatch}
 Ilyas et al.~\cite{ilyas2019adversarial} shift the framing once more, reframing adversarial examples not as pathological failures but as a \textit{mismatch between machine and human perception}: models exploit patterns that are genuinely predictive, but imperceptible to, and unintuitive for, humans. They distinguish \textit{predictive} features (features correlated with the label) from \textit{robust} features (features that remain predictive under perturbation). Since \textit{empirical risk minimisation} rewards any signal that improves accuracy, a learner will readily rely on predictive but non-robust features; adversarial vulnerability is then an expected consequence of standard training, rooted in the gap between the human sense of similarity and the statistical structure of the data. A striking experiment makes this concrete: they relabel every image of CIFAR-10 with a new, random target class and perturb it so that a model reads the new label, while to a human the images appear unchanged and hence entirely mislabelled. A standard model trained on this dataset nevertheless generalises well to the \textit{clean}, unmodified test set---evidence that it has latched onto real, transferable features that merely happen to be imperceptible to us. This view also bears on interpretability: if a model succeeds by relying on human-imperceptible features, there may be little in its decisions for a human to understand.
 
 \subsection{Pertinence of Adversarial Examples as a Subject Area}
