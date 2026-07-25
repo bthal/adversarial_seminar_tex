@@ -194,7 +194,7 @@ where $\mathrm{loss}_f(x+r,l)$ measures how strongly the network predicts class 
 
 Although the L-BFGS attack is still computationally expensive compared to later methods, its significance lies in establishing the existence of adversarial examples and motivating the extensive research that followed. For this reason, it is widely regarded as the starting point of adversarial machine learning research.\cite{goodfellow2014explaining, costa2024deep, liang2022adversarial}
 
-\subsubsection{Fast Gradient Sign Method (FGSM) (Draft!)}\label{sssec:fgsm}
+\subsubsection{Fast Gradient Sign Method (FGSM)}\label{sssec:fgsm}
 Goodfellow et al hypothesized that the reason adversarial examples exist is that commonly, models are designed to behave mostly linear \cite{goodfellow2014explaining}. Previously, it was suspected that models were too non-linear [cite]. 
 
 Based on this hypothesis, they came up with the fast gradient sign method to find $L_\infty$-constricted adversarial examples. $L_\infty$ is chosen because it models sensor inaccuracies: a small perturbation in a sensor value would still be encoded to the same digital value.%Under their reasoning that models are mostly linear, the functions they represent are mostly linear as well. That means that we can approximate them around a point x in input space using the gradient. Goodfellow et al %hypothesize that the cost function around this point also can be approximated this way since it (why??? How does this follow from before??)(This assumes that the cost function [...?] is mostly smooth? WARNING: MIGHT NOT BE 100% REASONABLE! ->PGD / is debateable). (when? go into detail!)
@@ -254,7 +254,7 @@ To find adversarial examples of a specific class \(y_{target}\) instead of maxim
 Searching adversarial examples by using projected gradient descent (PGD) as proposed by Madry et al. \cite{madry2017towards} is similar to the basic iterative method. Both use first-order information, i.e. the gradient of the loss function, to iteratively maximize the loss on an input in the neighborhood of the real image.
 Instead of using multiple FGSM steps, though, Madry et al. use projected gradient descent directly. 
 
-They formulate the adversary's goal as.... 
+They formulate the adversary's goal as
 \[
 \max_{\eta\in S}L(\theta, x+\eta, y)
 \]
@@ -622,7 +622,6 @@ Our central conclusion is that the significance of adversarial examples is prima
 
 \section*{Statement of Contributions}
 
-Please indicate here the contributions of each single author/student. This section can be dropped if there is a single author only.
 Bjarne Thal: Introduction (1), Definition of adversarial examples (2.1), Taxonomy (2.2), L-BGFS, DeepFool, Carlini-Wagner, Discussion (3), Conclusion (4)
 
 Marius Wrobel: FGSM, Variants of FGSM, PGD, Transfer Attacks (Jacobian-based, Ensemble Attacks, Momentum), ZOO, Notable Poisoning Attacks (2.4)
