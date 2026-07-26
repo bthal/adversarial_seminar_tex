@@ -250,11 +250,11 @@ They formulate the adversary's goal as
 \max_{\eta\in S}L(\theta, x+\eta, y)
 \]
 %\todo{include the dual formulation? Not that important for adv. attacks?} 
-Note the similarities to FGSM, by using \(S={\eta \vert \lVert \eta \rVert \leq \delta}\), we obtain its maximization problem. FGSM is therefore a specific method to tackle this general formulation.
+Note the similarities to FGSM, by using \(S=\{\eta \mid \lVert \eta \rVert \leq \delta\}\), we obtain its maximization problem. FGSM is therefore a specific method to tackle this general formulation.
 
 As a generalised, stronger attack, they propose using PGD. They support their argument with an experiment, starting PGD from random points in the vicinity of \(x\). While many different local maxima are found, they have roughly the same loss value. If an even better maximum existed, they argue, it would be hard to find with any first-order method. Therefore, no other first-order method could find it in reasonable time either, making PGD a useful "universal" first-order adversary.
 
-However, this strength has a caveat. As we will see in Section~\ref{sssec:momentum}, not every adversarial example corresponding to a local minimum is equally transferable to other models.
+However, this strength has a caveat. As we will see with momentum-based attacks later in this section ~\ref{sssec:momentum}, not every adversarial example corresponding to a local minimum is equally transferable to other models.
 
 %This also ties into adversarial training [dual formula]..?
 %-saddle point formulation (into theory part??) -> adversary goal, L norm flexibility, FGSM as special case
