@@ -324,10 +324,12 @@ The original work introduced variants based on different distance metrics, inclu
 The effectiveness of the C\&W attack also demonstrated weaknesses in several proposed defenses. In particular, it was shown to successfully bypass defensive distillation \cite{papernot2016distillation}, a technique proposed to improve adversarial robustness by training a model using softened output probabilities from a teacher network. Although defensive distillation appeared to increase resistance against earlier attacks, Carlini and Wagner demonstrated that the method did in fact only obscure the model's gradient albeit not truly hiding it. By directly targeting the logits with their loss function, Carlini and Wagner were able to efficiently generate adversarial examples in spite of defensive distillation by directly approximating the obscured decision boundary.
 %\end{comment}
 
-\subsubsection{Transfer Attacks}
-In a transfer attack, an adversary first obtains a substitute model that he has full access to as a stand-in for a target black-box model. On this substitute, white-box attacks can be performed to find adversarial examples. Since they generally transfer from one model to another, these can then be used to attack the actual target model.
+%\subsubsection{Transfer Attacks}
+
 
 \subsubsection{Jacobian-Based Dataset Augmentation}
+In a transfer attack, an adversary first constructs a substitute model that he has full access to as a stand-in for a target black-box model. On this substitute, white-box attacks like the ones described above can be performed to find adversarial examples. Since they generally transfer from one model to another, these can then be used to attack the actual target model.
+
 Papernot et al. \cite{papernot2017practical} introduced black-box attacks via transfer attacks where neither target model parameters nor a suitable data set is accessible to the attacker. Prior work by Biggio et al.\ \cite{biggio2013evasion} had introduced transfer attacks already, but granted access to such a dataset.
 
 First, the substitute architecture is defined based on input and output of the target, e.g. one adapted to images. The architecture is overall not a deciding factor in the success of this approach.
