@@ -40,7 +40,7 @@ Over the past decade, deep neural networks have become the dominant approach for
 
 This success, however, is built upon a surprisingly fragile foundation. In 2013, Szegedy et al.\ \cite{szegedy2013intriguing} showed that state-of-the-art classifiers can be fooled by \textit{adversarial examples}: inputs altered by a perturbation so small that it is imperceptible to a human, yet enough to make the model produce a confident but incorrect prediction. Such examples are neither rare accidents nor isolated mistakes of a single model: the same perturbed input frequently fools different architectures trained on different data, furthermore the vulnerability appears across all kinds of machine learners~\cite{goodfellow2014explaining, biggio2018wild}.
 
-This report serves as a broad introduction to the topic of adversarial attacks. In our examination of specific attack methods, we thus concentrate on the classical setting of evasion and poisoning attacks against image classifiers, surveying the ideas and methods that have shaped the research area.
+This report serves as a broad introduction to the topic of adversarial attacks. In our examination of specific attack methods, we thus concentrate on the classical setting of evasion and poisoning attacks against image classifiers, surveying the ideas and methods that have shaped the research area. We do focus on evasion attacks as in the kick-off lecture and include the poisoning attacks as another interesting approach. 
 
 The rest of the report is organised as follows. Section~\ref{sec:attacks} defines adversarial examples, introduces a taxonomy of adversarial attacks, and reviews the most influential evasion and poisoning attacks. Section~\ref{sec:discussion} then contains our discussion: the pertinence of adversarial attacks in the real and physical world, the competing attempts to explain why adversarial examples exist in the first place, and a reflection on what makes the phenomenon a worthwhile object of study.
 
@@ -328,7 +328,7 @@ The effectiveness of the C\&W attack also demonstrated weaknesses in several pro
 
 
 \subsubsection{Jacobian-Based Dataset Augmentation}
-In a transfer attack, an adversary first constructs a substitute model that he has full access to as a stand-in for a target black-box model. On this substitute, white-box attacks like the ones described above can be performed to find adversarial examples. Since they generally transfer from one model to another, these can then be used to attack the actual target model.
+In a transfer attack, an adversary first creates and trains a substitute model as a stand-in for a target black-box model that he has full access to. On this substitute, white-box attacks like the ones described above can be performed to find adversarial examples. Since they generally transfer from one model to another, these can then be used to attack the actual target model.
 
 Papernot et al. \cite{papernot2017practical} introduced black-box attacks via transfer attacks where neither target model parameters nor a suitable data set is accessible to the attacker. Prior work by Biggio et al.\ \cite{biggio2013evasion} had introduced transfer attacks already, but granted access to such a dataset.
 
