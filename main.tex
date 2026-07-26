@@ -21,7 +21,7 @@
 
 % metadata
 \title{Adversarial Attacks (AA)}
-\subtitle{Robust Deep Learning Seminar}
+\subtitle{Robust Deep Learning (Seminar)}
 \author{Bjarne Thal (446558) and Marius Wrobel (456734)}
 
 \institute{RWTH Aachen University, Germany\\
@@ -532,7 +532,7 @@ Somewhat surprisingly, in practice, confirmed \textit{malicious} adversarial-exa
 
  The second explanation is the one that we consider to be more plausible.  Building an adversarial example to defeat a system that a simpler attack would already defeat is like learning to pick a lock when the crowbar is cheaper, quicker, and works just as well. Interestingly, the few confirmed real-world cases, such as commercial CAPTCHA-solving services or the prompt injection of deployed chatbots, tend to be those where no such simpler alternative exists.
 
-This does not render the phenomenon academic in the pejorative sense. As machine learning is embedded ever more deeply into the physical world---autonomous vehicles, automated border control, biometric surveillance---the question of whether an input that is semantically unchanged to a human can nonetheless fool a sensor pipeline becomes a central engineering concern. The body of work on \textit{physical} adversarial attacks shows that it can: inconspicuous stickers on a stop sign reliably cause targeted misclassification, both in the laboratory and from a moving vehicle;\cite{eykholt2018robust} printable adversarial patches force a chosen label onto almost any scene they appear in;\cite{brown2017adversarial} adversarial eyeglass frames defeat face recognition;\cite{sharif2016accessorize} and spoofed sensor returns or crafted road-surface markings can mislead the perception stack of a production self-driving system~\cite{cao2019adversarial, tencent2019tesla}.
+This does not render the phenomenon academic in the pejorative sense. As machine learning is embedded ever more deeply into the physical world---autonomous vehicles, automated border control, biometric surveillance---the question of whether an input that is semantically unchanged to a human can nonetheless fool a sensor pipeline becomes a central engineering concern. The body of work on \textit{physical} adversarial attacks shows that it can, as the examples in Figure~\ref{fig:physical} illustrate: inconspicuous stickers on a stop sign reliably cause targeted misclassification, both in the laboratory and from a moving vehicle~\cite{eykholt2018robust}; printable adversarial patches force a chosen label onto almost any scene they appear in~\cite{brown2017adversarial}; adversarial eyeglass frames defeat face recognition~\cite{sharif2016accessorize}; and spoofed sensor returns or crafted road-surface markings can mislead the perception stack of a production self-driving system~\cite{cao2019adversarial, tencent2019tesla}.
 
 \begin{figure}[t]
 	\centering
@@ -563,9 +563,9 @@ The mechanism is a high-dimensional \textit{bloating} effect. For a linear model
 \[
 w^\top\eta = \epsilon\sum_{i=1}^{n}\lvert w_i\rvert = \epsilon\, m\, n.
 \]
-This means that in sufficiently high dimensions, many individually imperceptible, weight-aligned changes accumulate into one large change in the output. Figure~\ref{fig:linearity} illustrates this: the per-pixel budget stays flat as $n$ grows, while the change in the model's output climbs until it crosses the threshold that flips the prediction.
+This means that in sufficiently high dimensions, many individually imperceptible, weight-aligned changes accumulate into one large change in the output: the per-pixel budget stays flat as $n$ grows, while the change in the model's output climbs until it crosses the threshold that flips the prediction.
 
-This point is easily overstated, and often is: Goodfellow et al.\ do not claim that linearity is a necessary ingredient of the explanation. They show only that non-linearity is not necessary---the simplest possible model, plain logistic or softmax regression with no hidden layer, already exhibits adversarial examples---as they showcased with FGSM which we discussed in section~\ref{sssec:fgsm}. (The refined, later view holds that both dimensionality and local curvature matter, as reflected in the stronger iterative and minimum-norm attacks discussed above~\cite{madry2017towards, moosavi2016deepfool}.)
+}.)
 
 The linear view also provided the first explanation of transferability. Since adversarial examples now occupy broad, contiguous half-spaces rather than fine pockets, different models' adversarial regions overlap heavily, which explains why an example crafted for one model tends to fool another at all. And because the discriminative direction is largely a property of the data rather than of the model, models trained on the same task tend to learn similar weight vectors, so that the same perturbation pushes them toward the same incorrect class---which explains why the models tend to agree on that class. 
 
@@ -574,20 +574,8 @@ Ilyas et al.~\cite{ilyas2019adversarial} shift the framing once more, reframing 
 
 \begin{figure}[t]
     \centering
-    \begin{subfigure}[t]{0.49\textwidth}
-        \centering
-        \includegraphics[height=3.5cm]{fig_linearity.pdf}
-        \caption{The linear explanation: under an $L_\infty$ budget the per-pixel change $\lVert\eta\rVert_\infty=\epsilon$ stays fixed, while the output change $w^\top\eta=\epsilon\,m\,n$ grows linearly with the dimension $n$ until it crosses the threshold that flips the prediction.}
-        \label{fig:linearity}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[t]{0.49\textwidth}
-        \centering
-        \includegraphics[height=3.5cm]{adversarial_dataset}
-        \caption{Ilyas et al.'s feature experiment. \emph{Top:} original CIFAR-10 images. \emph{Middle:} the extracted predictive but non-robust features---barely recognisable to a human, yet highly informative to a model. \emph{Bottom:} the resulting set of (relabelled) adversarial examples, which looks entirely mislabelled to a human but still trains a classifier that generalises correctly to the clean test set.}
-        \label{fig:adversarialdataset}
-    \end{subfigure}
-    \caption{Two complementary explanations for the existence of adversarial examples: (a)~high-dimensional linearity~\cite{goodfellow2014explaining} and (b)~predictive but non-robust features~\cite{ilyas2019adversarial}.}
+    \includegraphics[height=3.5cm]{adversarial_dataset}
+    \caption{Ilyas et al.'s feature experiment~\cite{ilyas2019adversarial}. \emph{Top:} original CIFAR-10 images. \emph{Middle:} the extracted predictive but non-robust features---barely recognisable to a human, yet highly informative to a model. \emph{Bottom:} the resulting set of (relabelled) adversarial examples, which looks entirely mislabelled to a human but still trains a classifier that generalises correctly to the clean test set.}
     \label{fig:explaining}
 \end{figure}
 
