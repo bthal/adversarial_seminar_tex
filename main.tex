@@ -329,21 +329,15 @@ The effectiveness of the C\&W attack also demonstrated weaknesses in several pro
 
 \subsubsection{Jacobian-Based Dataset Augmentation}
 In a transfer attack, an adversary first creates and trains a substitute model as a stand-in for a target black-box model that he has full access to. On this substitute, white-box attacks like the ones described above can be performed to find adversarial examples. Since they generally transfer from one model to another, these can then be used to attack the actual target model.
-
 Papernot et al. \cite{papernot2017practical} introduced black-box attacks via transfer attacks where neither target model parameters nor a suitable data set is accessible to the attacker. Prior work by Biggio et al.\ \cite{biggio2013evasion} had introduced transfer attacks already, but granted access to such a dataset.
 
-First, the substitute architecture is defined based on input and output of the target, e.g. one adapted to images. The architecture is overall not a deciding factor in the success of this approach.
-
-The dataset restriction poses a difficulty for training the substitute. Papernot et al. solve this by querying the target on artificial data points to create a substitute dataset. Here, the selection of good data points to learn similar decision boundaries is crucial: a bad crafting strategy would require infeasible and highly suspicious amounts of queries to the target model. In particular, generation based on random noise does not work.
-
+Papernot et al. address the dataset restriction by querying the target on artificial data points to create a substitute dataset. Here, the selection of good data points to learn similar decision boundaries is crucial: a bad crafting strategy would require infeasible and highly suspicious amounts of queries to the target model. In particular, generation based on random noise does not work.
 Instead, they rely on a heuristic to find out in which input direction the (substitute!) model's output changes and adding new samples focused on these directions. For that, they rely on the substitute model's Jacobian matrix (multidimensional derivative, each entry is one output coordinate partially derived by an input coordinate) at input points.
 
-They start by collecting a set of samples somewhat representative of the target's input domain, such as different natural images.
-Next, an architecture is selected.
+The first step is collecting a set of samples somewhat representative of the target's input domain, such as different natural images. After, the substitute architecture is defined based on input and output of the target, e.g. one adapted to images. The architecture is overall not a deciding factor in the success of this approach.
+The following steps are then performed repeatedly: The adversary makes the target model label his current selection of samples, and then trains his substitute with the new examples. Next, he augments his dataset with additional input points:
 
-The following steps are then performed repeatedly: The adversary makes the target model label his current selection of samples, and then trains his substitute with the new examples. Then, he augments his dataset with additional input points.
-
-Let \(J_f(x)\) be the Jacobian of the substitute at a point x. Then, \(J_f(x)[o(x)]\) is the column corresponding to partial derivatives of the correct label (i.e. the one assigned by the target model). Papernot et al. now add the sign of this column scaled by a factor \(\lambda\) to point x: \(x = x + \lambda sign(J_f(x)[o(x)]\), and add it to their dataset.
+Let \(J_f(x)\) be the Jacobian of the substitute at a point x. Then, \(J_f(x)[o(x)]\) is the column corresponding to partial derivatives of the correct label (i.e. the one assigned by the target model). Papernot et al. now add the sign of this column scaled by a factor \(\lambda\) to point x: \(x = x + \lambda sign(J_f(x)[o(x)])\), and add it to their dataset. The idea is to move the example along directions in which model output changes strongly, with the intuition that these directions need more samples to accurately model the target's decision boundaries.
 
 By doing this to all current points, they obtain a larger sample set, so the model trained in the next iteration is closer to the target. Note that every epoch, the model is trained from scratch. With enough iterations, the substitute can then be used to generate the adversarial examples.
 % !!! check Jacobian definition
