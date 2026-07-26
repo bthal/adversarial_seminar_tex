@@ -343,7 +343,7 @@ By doing this to all current points, they obtain a larger sample set, so the mod
 % !!! check Jacobian definition
 
 \subsubsection{Ensemble Attacks}
-To improve transferability of adversarial examples created on substitute models, Liu et al. \cite{liu2016delving} argue that an adversarial example that works well for multiple models at the same time is bound to transfer better than one that only works on a single one.
+For transferability attacks to work, it is crucial that adversarial examples constructed on the substitute model translate well to the target model. To improve this transferability, Liu et al. \cite{liu2016delving} argue that an adversarial example that works well for multiple models at the same time is bound to transfer better than one that only works on a single one.
 
 They therefore propose that an adversary in the transfer attack setting crafts adversarial examples against an ensemble of models. For a targeted attack, they suggest the negative-log-likelihood-objective:
 
@@ -565,7 +565,7 @@ w^\top\eta = \epsilon\sum_{i=1}^{n}\lvert w_i\rvert = \epsilon\, m\, n.
 \]
 This means that in sufficiently high dimensions, many individually imperceptible, weight-aligned changes accumulate into one large change in the output: the per-pixel budget stays flat as $n$ grows, while the change in the model's output climbs until it crosses the threshold that flips the prediction.
 
-}.)
+%}.)
 
 The linear view also provided the first explanation of transferability. Since adversarial examples now occupy broad, contiguous half-spaces rather than fine pockets, different models' adversarial regions overlap heavily, which explains why an example crafted for one model tends to fool another at all. And because the discriminative direction is largely a property of the data rather than of the model, models trained on the same task tend to learn similar weight vectors, so that the same perturbation pushes them toward the same incorrect class---which explains why the models tend to agree on that class. 
 
