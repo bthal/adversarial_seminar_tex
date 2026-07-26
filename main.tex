@@ -433,23 +433,21 @@ The first poisoning attack that got greater attention was Biggio et al.'s gradie
 \subsubsection{Backdoor Poisoning Attacks}
 % !!! In an authentication system, a backdoor ...
 With backdoor attacks on machine learning as proposed by Chen et al. \cite{chen2017targeted} % in the context of authentication systems, the adversary's goal is to introduce a backdoor for himself into the model, meaning a way to bypass the mechanism. More specifically, the adversary seeks to create backdoor instances, inputs that model will assign the wrong label (chosen by the adversary) to and thereby grant the adversary access.
-and Gu et al. \cite{gu2017badnets}, the adversary's goal is to introduce a backdoor for himself into the model. While the performance on normal inputs is to be kept up, the model should react to specific inputs by misclassifying them. (Either generally, or targeted.) These specific inputs carry a special pattern, the "key" or "trigger".
+and Gu et al. \cite{gu2017badnets}, the adversary's goal is to introduce a backdoor for himself into the model. While the performance on normal inputs is to be kept up, the model should react to specific inputs by misclassifying them, either generally, or targeted. These specific inputs carry a special pattern, the "key" or "trigger".
 
 Gu et al. consider an adversary that has full access to the model or a base version of it. Namely, an ML-as-a-service provider (full access) and a provider of pretrained models (base version access). In both cases, the architecture is specified already, as well as a training set. A backdoor key pattern is chosen by the attacker. The adversary has to find model weights performing well on general samples from the set yet vulnerable to the backdoor.
 
-For that, Gu et al. use training set poisoning, adding a fraction of training images to the dataset again, only with the trigger pattern included and the labels changed according to varying strategies. They did not yet derive a way to optimise poison samples, instead, pattern, label change formula and infected fraction need to be selected by the adversary.
+For that, Gu et al. use training set poisoning, adding a fraction of training images to the dataset again, only with the trigger pattern included and the labels changed according to varying strategies. They did not yet derive a way to optimise poison samples, instead, pattern, label change formula and infected fraction need to be selected by the adversary. In general, their focus was on the feasibility rather than the exact attack procedure.
 
-Chen et al. instead use a black-box threat model where the adversary does not have access to model architecture or training data and can only inject a small number of adversary samples including arbitrary labels. The key should not be easily noticeable by a human observer. Crucially, the model performance on non-backdoor inputs should be kept up.
+Chen et al. instead use a black-box threat model where the adversary does not have access to model architecture or training data and can only inject a small number of adversary samples including arbitrary labels, in contrast with the powerful adversary assumed by Gu et al. 
 
-Backdoor keys may either be a single instance or a pattern added to instances. The former ("input-instance-key" strategy) allows injecting just very few poisoned examples while the latter ("pattern-key") can be used to craft adversarial examples from a wide range of inputs, which is often more useful to a hypothetical attack. 
+Backdoor keys may either be a single instance or a pattern added to instances. The former ("input-instance-key" strategy) allows injecting just very few poisoned examples while the latter ("pattern-key") can be used to craft adversarial examples from a wide range of inputs, which is often more useful to a hypothetical attack and resembles Gu et al.'s poisoning. 
 
 In input-instance-key strategies, Chen et al. propose adding different noised versions of the key-to-be to the training set, each with the chosen label. The idea is to get the model to overfit to these.
-
 In Pattern-key strategies, the adversary can blend a key pattern onto pictures, add an accessory, or blend in an accessory according to Chen et al.'s suggestions. The idea of the blending is to make the pattern harder to spot for humans. In any case, the perturbed sample is added to the dataset as poison. 
-
 Like Gu et al.'s attack, theirs also depends on hyperparameter choices only, with the framework not optimising poisoning on its own. 
 
-\subsubsection{Clean-Label Attacks}
+\subsubsection{Clean-Label Backdoor Attacks}
 Notably, while the backdoor poisoning attack described by Chen et al. does not need access to the model, the adversary has to be able to assign arbitrary labels to samples, as does the one by Gu et al. However, this can be highly noticeable and alert human overseers to the attack or might just not be feasible in another way. Clean-label attacks  do not give such power to the adversary.
 
 One such attack was proposed by Shafahi et al. \cite{shafahi2018poison}. In contrast to Chen et al.'s attack, the adversary does know the model parameters, which might happen if the target model is based on a pretrained, freely accessible one. His goal is to have a target instance misclassified without modifying it, e.g. getting a malware script to bypass a ML antivirus. 
@@ -463,9 +461,9 @@ where the first term compares the target t and poison candidates x in feature sp
 For optimisation, two steps are iterated: First, a gradient step ("forward step"), then a step towards b ("backwards step").
 %\todo{FAIL graphic - similar}
 
-\subsubsection{Clean-Label Backdoor Attacks}
+%\subsubsection{Clean-Label Backdoor Attacks}
 Saha et al. \cite{saha2020hidden}
-made an effort to combine clean-label attacks with backdoor poisoning attacks, albeit Turner et al. did the same a year earlier \cite{turner2019label}. Both also considered how to hide the trigger during poisoning to decrease the noticeability of the backdoor, though differently. Turner et al. manually select a "trigger amplitude", essentially an opaqueness. Saha et al., on the other hand, directly incorporate it into their optimisation and not even have the pattern itself in the poisoned instance. 
+made an effort to combine the clean-label approach with backdoor poisoning attacks, albeit Turner et al. did the same a year earlier \cite{turner2019label}. Both also considered how to hide the trigger during poisoning to decrease the noticeability of the backdoor, though differently. Turner et al. manually select a "trigger amplitude", essentially an opaqueness. Saha et al., on the other hand, directly incorporate it into their optimisation and not even have the pattern itself in the poisoned instance. 
 % !!! vielleicht doch nicht so ähnlich, die beiden? cf Narcissus
 
 % !!! images here?
@@ -475,19 +473,17 @@ The attack itself is similar to Shafahi et al.'s. The adversary chooses a source
 
 Let \(\tilde{s}\) be the patched source, \(t\) the target, and \(\epsilon\) a small, chosen threshold. Saha et al. optimise
 \[
-\arg\min_x{\lvert \lvert f(x) - f(\tilde{s}) \rvert \rvert_{2}^2} \quad\quad \textbf{s.t.} \quad \lvert \lvert f(x) - f(t) \rvert \rvert_{\infty}^2 < \epsilon
+\arg\min_x{\lvert \lvert f(x) - f(\tilde{s}) \rvert \rvert_{2}^2} \quad\quad \textbf{s.t.} \quad \lvert \lvert x - t \rvert \rvert_{\infty} < \epsilon
 \]
 to obtain the poisoned sample x. Again, \(f\) is the output of the second-to-last layer, the feature space representation.
 % !!! go more in detail about this look on NNs: "only last layer decides"?
-To optimise, they use projected gradient descent (Section~\ref{PGD}). However, in each optimisation step, a new randomly-patched source is selected so the backdoor generalises to arbitrary images and patch placements. %...% !!! ... multiple at once, 1:1 problem
+To optimise, they use projected gradient descent. However, in each optimisation step, a new randomly-patched source is selected so the backdoor generalises to arbitrary images and patch placements. %...% !!! ... multiple at once, 1:1 problem
 
 %Narcissus, Label-consistent
-A more recent work by Zeng et al. \cite{zeng2023narcissus} addresses issues with prior work on clean-label backdoor attacks. % !!! which ones
+A more recent work by Zeng et al. \cite{zeng2023narcissus} addresses the inefficiency of choosing arbitrary trigger patterns while restricting the adversary further. 
 They consider a black-box threat model where the adversary can only poison a small subset of the training data. The adversary chooses the target class and knows some examples in it. He also has general information on the task the victim model should perform, such as "face recognition", but not specifics like classes used. This enables the attacker to draw up more data instances related to the task, though they might not belong to the original data distribution and are therefore referred to as "public out of distribution (POOD) examples". This is especially easy in image or language tasks where lots of samples are available in the web.
 
-All in all, the adversary is considerably weaker than in aforementioned attacks.
-
-Their approach revolves around optimising the trigger pattern used under a constraint so it is harder to notice for humans (as in evasion attacks). 
+Their approach revolves around optimising the trigger pattern used under a constraint so it is harder to notice for humans. Previous work had the adversary craft poisoning samples with an arbitrarily-choosen trigger.
 % !!! - Only some prior work was made on this, such as LIRA...
 Suppose the attacker had access to the model the victim would obtain without poisoning. We call this model the oracle \(f_{orc}\). Recall that he also has access to a dataset of the target class \(D_t\). Zeng et al.'s approach is to choose a trigger \(\delta^{*}\) maximising the oracle's confidence on the target class, i.e. solving 
 \[
@@ -502,10 +498,8 @@ However, the adversary does not have access to \(f_{orc}\). Instead, Zeng et al.
 
 Now, the attack works as follows. First, \(f_{sur}\) is trained using \(D_{POOD}\) and \(D_t\).
 While training the surrogate model on both \(D_{POOD}\) and \(D_t\) simultaneously would be possible, Zeng et al. suggest training on \(D_{POOD}\) first and fine-tune on \(D_t\) to make modification for a possible second attack on another class more efficient.
-
 In the second step, they use (stochastic) projected gradient descent to find the trigger \(\delta^{*}\) and subsequently add it to a portion of the target class samples \(D_t\).
 The victim is then given this poisoned target class data set.
-
 In an eventual exploit, the adversary adds the trigger to the desired input. It is an option to amplify the trigger to increase attack success rates.
 % !!! NArcissus - Zeng et al. \cite{zeng2023narcissus} 
 
