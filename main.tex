@@ -40,7 +40,7 @@ Over the past decade, deep neural networks have become the dominant approach for
 
 This success, however, is built upon a surprisingly fragile foundation. In 2013, Szegedy et al.\ \cite{szegedy2013intriguing} showed that state-of-the-art classifiers can be fooled by \textit{adversarial examples}: inputs altered by a perturbation so small that it is imperceptible to a human, yet enough to make the model produce a confident but incorrect prediction. Such examples are neither rare accidents nor isolated mistakes of a single model: the same perturbed input frequently fools different architectures trained on different data, furthermore the vulnerability appears across all kinds of machine learners~\cite{goodfellow2014explaining, biggio2018wild}.
 
-This report serves as a broad introduction to the topic of adversarial attacks. In our examination of specific attack methods, we thus concentrate on the classical setting of evasion and poisoning attacks against image classifiers, surveying the ideas and methods that have shaped the research area.
+This report serves as a broad introduction to the topic of adversarial attacks. In our examination of specific attack methods, we thus concentrate on the classical setting of evasion and poisoning attacks against image classifiers, surveying the ideas and methods that have shaped the research area. We do focus on evasion attacks as in the kick-off lecture and include the poisoning attacks as another interesting approach. 
 
 The rest of the report is organised as follows. Section~\ref{sec:attacks} defines adversarial examples, introduces a taxonomy of adversarial attacks, and reviews the most influential evasion and poisoning attacks. Section~\ref{sec:discussion} then contains our discussion: the pertinence of adversarial attacks in the real and physical world, the competing attempts to explain why adversarial examples exist in the first place, and a reflection on what makes the phenomenon a worthwhile object of study.
 
@@ -250,11 +250,11 @@ They formulate the adversary's goal as
 \max_{\eta\in S}L(\theta, x+\eta, y)
 \]
 %\todo{include the dual formulation? Not that important for adv. attacks?} 
-Note the similarities to FGSM, by using \(S={\eta \vert \lVert \eta \rVert \leq \delta}\), we obtain its maximization problem. FGSM is therefore a specific method to tackle this general formulation.
+Note the similarities to FGSM, by using \(S=\{\eta \mid \lVert \eta \rVert \leq \delta\}\), we obtain its maximization problem. FGSM is therefore a specific method to tackle this general formulation.
 
 As a generalised, stronger attack, they propose using PGD. They support their argument with an experiment, starting PGD from random points in the vicinity of \(x\). While many different local maxima are found, they have roughly the same loss value. If an even better maximum existed, they argue, it would be hard to find with any first-order method. Therefore, no other first-order method could find it in reasonable time either, making PGD a useful "universal" first-order adversary.
 
-However, this strength has a caveat. As we will see in Section~\ref{sssec:momentum}, not every adversarial example corresponding to a local minimum is equally transferable to other models.
+However, this strength has a caveat. As we will see with momentum-based attacks later in this section ~\ref{sssec:momentum}, not every adversarial example corresponding to a local minimum is equally transferable to other models.
 
 %This also ties into adversarial training [dual formula]..?
 %-saddle point formulation (into theory part??) -> adversary goal, L norm flexibility, FGSM as special case
@@ -265,7 +265,7 @@ However, this strength has a caveat. As we will see in Section~\ref{sssec:moment
 
 %\begin{comment}
 \subsubsection{DeepFool}
- DeepFool was introduced by Moosavi-Dezfooli et al.~\cite{moosavi2016deepfool} in 2016. The central idea of this iterative method is to characterise adversarial vulnerability geometrically: rather than loosely optimising an attack loss, DeepFool estimates the distance of an input to the closest decision boundary. For affine classifiers, this distance could be calculated in a closed form by projecting the input point onto the decision hyperplane. The highly nonlinear decision boundaries of deep neural networks are addressed by DeepFool by exploiting the observation that although the true boundary of a neural network may be highly curved, sufficiently small neighborhoods can often be approximated accurately by a hyperplane. The shortest path to this approximate boundary is assumed to provide a good estimate of the minimal adversarial perturbation. This auxiliary hyperplane is recomputed at each iteration through a first-order Taylor expansion of the classifier around the current point; as the point is repeatedly projected onto the latest hyperplane, it moves closer and closer to the true, nonlinear decision boundary until it eventually crosses it. In mathematical terms, at an intermediate point $x_i$, the classifier is iteratively displaced by its local linear approximation,                                   
+ DeepFool was introduced by Moosavi-Dezfooli et al.~\cite{moosavi2016deepfool} in 2016. The central idea of this iterative method is to characterise adversarial vulnerability geometrically: rather than loosely optimising an attack loss, DeepFool estimates the distance of an input to the closest decision boundary. For affine classifiers, this distance could be calculated in a closed form by projecting the input point onto the decision hyperplane. Moosavi-Dezfooli et al. suspect that deep neural networks have highly nonlinear decision boundaries, contrary to Goodfellow et al.'s argumentation. These boundaries are addressed by DeepFool by exploiting the observation that although the true boundary of a neural network may be highly curved, sufficiently small neighborhoods can often be approximated accurately by a hyperplane. The shortest path to this approximate boundary is assumed to provide a good estimate of the minimal adversarial perturbation. This auxiliary hyperplane is recomputed at each iteration through a first-order Taylor expansion of the classifier around the current point; as the point is repeatedly projected onto the latest hyperplane, it moves closer and closer to the true, nonlinear decision boundary until it eventually crosses it. In mathematical terms, at an intermediate point $x_i$, the classifier is iteratively displaced by its local linear approximation,                                   
 
 \begin{equation}
     f(x) \approx f(x_i) + \nabla f(x_i)^T(x-x_i),
@@ -324,10 +324,12 @@ The original work introduced variants based on different distance metrics, inclu
 The effectiveness of the C\&W attack also demonstrated weaknesses in several proposed defenses. In particular, it was shown to successfully bypass defensive distillation \cite{papernot2016distillation}, a technique proposed to improve adversarial robustness by training a model using softened output probabilities from a teacher network. Although defensive distillation appeared to increase resistance against earlier attacks, Carlini and Wagner demonstrated that the method did in fact only obscure the model's gradient albeit not truly hiding it. By directly targeting the logits with their loss function, Carlini and Wagner were able to efficiently generate adversarial examples in spite of defensive distillation by directly approximating the obscured decision boundary.
 %\end{comment}
 
-\subsubsection{Transfer Attacks}
-In a transfer attack, an adversary first obtains a substitute model that he has full access to as a stand-in for a target black-box model. On this substitute, white-box attacks can be performed to find adversarial examples. Since they generally transfer from one model to another, these can then be used to attack the actual target model.
+%\subsubsection{Transfer Attacks}
+
 
 \subsubsection{Jacobian-Based Dataset Augmentation}
+In a transfer attack, an adversary first creates and trains a substitute model as a stand-in for a target black-box model that he has full access to. On this substitute, white-box attacks like the ones described above can be performed to find adversarial examples. Since they generally transfer from one model to another, these can then be used to attack the actual target model.
+
 Papernot et al. \cite{papernot2017practical} introduced black-box attacks via transfer attacks where neither target model parameters nor a suitable data set is accessible to the attacker. Prior work by Biggio et al.\ \cite{biggio2013evasion} had introduced transfer attacks already, but granted access to such a dataset.
 
 First, the substitute architecture is defined based on input and output of the target, e.g. one adapted to images. The architecture is overall not a deciding factor in the success of this approach.
