@@ -151,7 +151,7 @@ ZOO~\cite{chen2017zoo}                                  & Black-box & Evasion   
 BadNets~\cite{gu2017badnets}                            & White-box & Poisoning & Targeted   & - \\
 Targeted backdoor~\cite{chen2017targeted}               & Black-box & Poisoning & Targeted   & - \\
 Poison Frogs~\cite{shafahi2018poison}                   & White-box & Poisoning & Targeted   & - \\
-Clean-label backdoor~\cite{turner2019label,saha2020hidden} & White-box & Poisoning & Targeted & - \\
+Hidden Trigger Backdoor Attacks~\cite{saha2020hidden} & White-box & Poisoning & Targeted & - \\
 Narcissus~\cite{zeng2023narcissus}                      & Black-box & Poisoning & Targeted   & $L_\infty$ \\
 \bottomrule
 \end{tabular}
@@ -188,7 +188,7 @@ Although the L-BFGS attack is still computationally expensive compared to later 
 \subsubsection{Fast Gradient Sign Method (FGSM)}\label{sssec:fgsm}
 Goodfellow et al.\ hypothesized that the reason adversarial examples exist is that commonly, models are designed to behave mostly linear \cite{goodfellow2014explaining}. Previously, it was suspected that models were too non-linear \cite{szegedy2013intriguing}.
 
-Based on this hypothesis, they came up with the fast gradient sign method to find $L_\infty$-constrained adversarial examples. $L_\infty$ is chosen because it models sensor inaccuracies: a small perturbation in a sensor value would still be encoded to the same digital value.%Under their reasoning that models are mostly linear, the functions they represent are mostly linear as well. That means that we can approximate them around a point x in input space using the gradient. Goodfellow et al %hypothesize that the cost function around this point also can be approximated this way since it (why??? How does this follow from before??)(This assumes that the cost function [...?] is mostly smooth? WARNING: MIGHT NOT BE 100% REASONABLE! ->PGD / is debateable). (when? go into detail!)
+Based on this hypothesis, they came up with the fast gradient sign method to find $L_\infty$-constrained adversarial examples. $L_\infty$ is chosen because it models sensor inaccuracies: a small perturbation in a sensor value would still be encoded to the same digital value due to the (usually 8-bit) quantization. %Under their reasoning that models are mostly linear, the functions they represent are mostly linear as well. That means that we can approximate them around a point x in input space using the gradient. Goodfellow et al %hypothesize that the cost function around this point also can be approximated this way since it (why??? How does this follow from before??)(This assumes that the cost function [...?] is mostly smooth? WARNING: MIGHT NOT BE 100% REASONABLE! ->PGD / is debateable). (when? go into detail!)
 Unlike L-BFGS, they did not choose a specific target class they want the adversarial example to be mistaken for. Instead, they aim to maximise the loss value of the adversarial example. That means that we want to solve 
 
 \[\arg\max_{x' s.t. \lvert \lvert x'-x \rvert \rvert_\infty \leq \epsilon} L_f(x', y) = x + \arg\max_{\lvert\lvert\delta\rvert\rvert_\infty\leq\epsilon}L_f(x+\delta, y)\]
@@ -457,7 +457,7 @@ p = \arg\min_x {\lvert \lvert g(x) - g(v) \rvert \rvert_{2}^2
 + \lambda \lvert \lvert x - b \rvert \rvert_{2}^2} 
 \]
 where \(g\) is the output of the networks second-to-last layer (i.e., the feature representation) and \(\lambda\) is a constant. The first term compares the target v and poison candidates x in feature space (the more similar, the better), and the second penalises difference from the base instance. The general idea is to find a poison instance close to b, therefore likely to be labeled the same, yet close to v in feature space (output of second-to-last layer), so v is treated the same as b by the model. %Shafahi et al. argue that a suitable x can be found due to f being supposedly highly nonlinear. 
-For optimisation, two steps are iterated: First, a gradient step ("forward step"), then a step towards b ("backwards step").
+For optimisation, two steps are iterated: First, a gradient step to minimize x-v feature space distance("forward step"), then a step towards b to minimize x-b pixel distance ("backwards step").
 %\todo{FAIL graphic - similar}
 
 %\subsubsection{Clean-Label Backdoor Attacks}
