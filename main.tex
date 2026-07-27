@@ -449,7 +449,7 @@ Like Gu et al.'s attack, theirs also depends on hyperparameter choices only, wit
 \subsubsection{Clean-Label Backdoor Attacks}
 Notably, while the backdoor poisoning attack described by Chen et al. does not need access to the model, the adversary has to be able to assign arbitrary labels to samples, as does the one by Gu et al. However, this can be highly noticeable and alert human overseers to the attack or might just not be feasible in another way. Clean-label attacks  do not give such power to the adversary.
 
-One such attack was proposed by Shafahi et al. \cite{shafahi2018poison}. In contrast to Chen et al.'s attack, the adversary does know the model parameters, which might happen if the target model is based on a pretrained, freely accessible one. His goal is to have a target instance \(v\) misclassified without modifying it, e.g. getting a malware script to bypass a ML antivirus. 
+One such attack was proposed by Shafahi et al. \cite{shafahi2018poison}. In contrast to Chen et al.'s attack, the adversary does know the model parameters, which might happen if the target model is based on a pretrained, freely accessible one. His goal is to have a chosen target instance \(v\) misclassified without modifying it, e.g. getting a malware script to bypass a ML antivirus. 
 
 First, he samples a base instance \(b\), such that its class, the "base class", is the one he wants the target instance to be classified as. With this, he crafts a poison instance $p$ by solving 
 \[
@@ -468,7 +468,7 @@ made an effort to combine the clean-label approach with backdoor poisoning attac
 % !!! images here?
 Saha et al. consider a threat model in which the adversary can add poison to a dataset the victim uses for fine-tuning a pretrained model, which the adversary has access to. The scenario is similar to the one described by Gu et al., with the difference that the adversary attacks the fine-tuning, not the pretraining.
 
-The attack itself is similar to Shafahi et al.'s. The adversary samples a source \(s\) and a base image \(b\) from the data distribution. He then applies his trigger to the source, obtaining the patched source. Like before, the poison sample is optimised to be close to the base image in pixel space (so it probably receives the same label) while close to the patched source in feature space (so the model has difficulties distinguishing them). Note that the Saha et al. call the base image the "target" instead.
+The attack itself is similar to Shafahi et al.'s. The adversary samples a source \(s\) and a base image \(b\) from the data distribution. He then applies his trigger to the source, obtaining the patched source. Like before, the poison sample is optimised to be close to the base image in pixel space (so it probably receives the same label) while close to the patched source in feature space (so the model has difficulties distinguishing them). Note that the Saha et al. call the base image the "target" instead. Figure \ref{fig:HTBA} illustrates their approach.
 
 Let \(\tilde{s}\) be the patched source, \(b\) the base, and \(\epsilon\) a small, chosen threshold. Saha et al. optimise
 \[
@@ -477,6 +477,15 @@ Let \(\tilde{s}\) be the patched source, \(b\) the base, and \(\epsilon\) a smal
 to obtain the poisoned sample x. Again, \(g\) is the output of the second-to-last layer, the feature space representation.
 % !!! go more in detail about this look on NNs: "only last layer decides"?
 To optimise, they use projected gradient descent. However, in each optimisation step, a new randomly-patched source is selected so the backdoor generalises to arbitrary images and patch placements. %...% !!! ... multiple at once, 1:1 problem
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=1\textwidth]{HTBA_process.png}
+    \caption{Saha et al.'s poisoning approach. \emph{Left:} A poisoned sample seeks to collide with the patched source in feature space while being close to the base (here: target) in pixel space. \emph{Middle:} The poison sample is added to the victim's dataset. \emph{Right:} In testing, the adversary can now apply the patch to images to have them misclassified.
+    Taken from Saha et al. \cite{saha2020hidden}.}
+    \label{fig:HTBA}
+\end{figure}
+
 
 %Narcissus, Label-consistent
 A more recent work by Zeng et al. \cite{zeng2023narcissus} addresses the inefficiency of choosing arbitrary trigger patterns, while restricting the adversary further. 
