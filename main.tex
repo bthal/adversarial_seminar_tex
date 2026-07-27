@@ -38,9 +38,9 @@
 
 Over the past decade, deep neural networks have become the dominant approach for a broad range of perception tasks, from image classification and speech recognition to natural language understanding; in many cases matching or surpassing human performance~\cite{lecun2015deep, he2015delving}. Due to their strength, such models are increasingly deployed in critical settings, such as autonomous driving~\cite{grigorescu2020survey}  or biometric identification~\cite{schroff2015facenet}.
 
-This success, however, is built upon a surprisingly fragile foundation. In 2013, Szegedy et al.\ \cite{szegedy2013intriguing} showed that state-of-the-art classifiers can be fooled by \textit{adversarial examples}: inputs altered by a perturbation so small that it is imperceptible to a human, yet enough to make the model produce a confident but incorrect prediction. Such examples are neither rare accidents nor isolated mistakes of a single model: the same perturbed input frequently fools different architectures trained on different data, furthermore the vulnerability appears across all kinds of machine learners~\cite{goodfellow2014explaining, biggio2018wild}.
+This success, however, is built upon a surprisingly fragile foundation. In 2013, Szegedy et al.\ \cite{szegedy2013intriguing} showed that state-of-the-art classifiers can be fooled by \textit{adversarial examples}: inputs altered by a perturbation so small that it is imperceptible to a human, yet enough to make the model produce a confident but incorrect prediction. Such examples are neither rare accidents nor isolated mistakes of a single model: the same perturbed input frequently fools different architectures trained on different data, furthermore the vulnerability appears across all kinds of machine learners~\cite{goodfellow2014explaining, biggio2018wild}. This portability across models---known as \textit{transferability}---is one of the defining characteristics of adversarial examples and a large part of their appeal as an object of study, as it even enables attacks against models the adversary cannot directly inspect.
 
-This report serves as a broad introduction to the topic of adversarial attacks. In our examination of specific attack methods, we thus concentrate on the classical setting of evasion and poisoning attacks against image classifiers, surveying the ideas and methods that have shaped the research area. We do focus on evasion attacks as in the kick-off lecture and include the poisoning attacks as another interesting approach. 
+This report serves as a broad introduction to the topic of adversarial attacks. In our examination of specific attack methods, we thus concentrate on the classical setting of evasion and poisoning attacks against image classifiers, surveying the ideas and methods that have shaped the research area. We focus on image classification throughout, both because the bulk of the research area centres on this setting and because its inherently visual nature of such tasks mean easily interpretable illustrations. We do focus on evasion attacks as in the kick-off lecture and include the poisoning attacks as another interesting approach. 
 
 The rest of the report is organised as follows. Section~\ref{sec:attacks} defines adversarial examples, introduces a taxonomy of adversarial attacks, and reviews the most influential evasion and poisoning attacks. Section~\ref{sec:discussion} then contains our discussion: the pertinence of adversarial attacks in the real and physical world, the competing attempts to explain why adversarial examples exist in the first place, and a reflection on what makes the phenomenon a worthwhile object of study.
 
@@ -527,6 +527,9 @@ In an eventual exploit, the adversary adds the trigger to the desired input. It 
 
 \section{Discussion}
 \label{sec:discussion}
+
+As throughout this survey, the following discussion stays within the setting of image classification, which concentrates most of the research and, being inherently visual, affords readily interpretable illustrations of the phenomena at hand.
+
 \subsection{Real-World and Physical Adversarial Attacks}
 
 Somewhat surprisingly, in practice, confirmed \textit{malicious} adversarial-example attacks against real institutions or individuals remain strikingly rare~\cite{biggio2018wild, raff2023dont}. Two explanations seem possible. 
