@@ -181,7 +181,7 @@ subject to the box constraint
 x+\delta \in [0,1]^m,
 \end{equation}
 
-where $L_f(x+r,t)$ measures how strongly the network predicts class $t$. The parameter $c>0$ controls the trade-off between achieving the target misclassification and keeping the perturbation small, and the box constraint ensures that the perturbed input remains a valid image. This reformulation yields a differentiable objective whose gradients can be computed via backpropagation, allowing the perturbation to be found efficiently using the box-constrained Limited-memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS) optimisation algorithm. A line search over $c$ is then performed to identify the smallest successful perturbation that causes the classifier to output the target class.
+where $L_f(x+\delta,t)$ measures how strongly the network predicts class $t$. The parameter $c>0$ controls the trade-off between achieving the target misclassification and keeping the perturbation small, and the box constraint ensures that the perturbed input remains a valid image. This reformulation yields a differentiable objective whose gradients can be computed via backpropagation, allowing the perturbation to be found efficiently using the box-constrained Limited-memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS) optimisation algorithm. A line search over $c$ is then performed to identify the smallest successful perturbation that causes the classifier to output the target class.
 
 Although the L-BFGS attack is still computationally expensive compared to later methods, its significance lies in motivating the extensive research that followed. For this reason, it is widely regarded as the starting point of adversarial machine learning research~\cite{goodfellow2014explaining, costa2024deep, liang2022adversarial}.
 
@@ -224,16 +224,15 @@ Since this approach only needs one backpropagation step instead of iterations li
 Different variants of FGSM were proposed by Kurakin et al.~\cite{kurakin2016adversarial, kurakin2017physical}.
 
 The so-called \textbf{basic iterative method} applies FGSM multiple times with a small step size \cite{kurakin2017physical}. The adversarial example is given by
-% !!! x X difference!!
 \[
 x_{0}^{adv} = x, \quad x_{N+1}^{adv} = Clip_{x,\epsilon}
 (
-x_{N}^{adv} + \alpha \cdot sign(\nabla_X L(x_{N}^{adv} , y))
+x_{N}^{adv} + \alpha \cdot sign(\nabla_x L_f(x_{N}^{adv} , y))
 )
 \]
 where \(Clip_{x,\epsilon}\) implements pixel-wise constriction to the \(\epsilon\)-neighborhood of \(x\) \cite{kurakin2017physical}.
 
-To find adversarial examples of a specific class \(t\) instead of maximising the loss function, FGSM can be modified to maximise that classes probability \(p(t | x)\). This can be achieved with a single step in direction of \(sign(\nabla_X log(p(t | x)))\) \cite{kurakin2017physical}
+To find adversarial examples of a specific class \(t\) instead of maximising the loss function, FGSM can be modified to maximise that classes probability \(p(t | x)\). This can be achieved with a single step in direction of \(sign(\nabla_x \log(p(t | x)))\) \cite{kurakin2017physical}
 %loss function formulation for Crossentropy
 , analogous to basic FGSM, or using multiple, like in the aforementioned basic iterative method \cite{kurakin2016adversarial}. As target class, the one originally deemed least likely by the target model can be used. 
 
@@ -350,7 +349,7 @@ They therefore propose that an adversary in the transfer attack setting crafts a
 \[
 x^{*} = \arg\min_{x'}{-\log((\sum_{i=1}^k \beta_i f_i(x')) \cdot \mathbb{1}_{t}) + \lambda \frac{\lVert x - x'\rVert_2}{\sqrt{N}}}
 \]
-where \(N\) is the number of dimensions, \(t\) is the target class, \(f_i(\cdot)\) is each models output, \(\beta_i\) scaling factors for each such that \(\sum_i\beta_i=1\), for example simply \(1/k\). As a whole, this formula balances maximizing the probability assigned to the target class (first part) and keeping the perturbation small (second part). The \(sqrt{N}\) serves as a normalisation factor for different input dimensions.
+where \(N\) is the number of dimensions, \(t\) is the target class, \(f_i(\cdot)\) is each models output, \(\beta_i\) scaling factors for each such that \(\sum_i\beta_i=1\), for example simply \(1/k\). As a whole, this formula balances maximizing the probability assigned to the target class (first part) and keeping the perturbation small (second part). The \(\sqrt{N}\) serves as a normalisation factor for different input dimensions.
 
 \subsubsection{MI-FGSM and Momentum}
 \label{sssec:momentum}
@@ -400,7 +399,7 @@ l(x,t) = \max\{ \max_{i\neq t} \{\log[f(x)]_i\} - \log[f(x)]_t,-\kappa \}
 for targeted attacks and
 \[
 %f(x,t) = \max\left\{ \max_{i\neq t} \log[F(x)]_i - \log[F(x)]_t,-\kappa \right\}
-l(x) = \max\{ \log[f(x)]_{y} - \max_{i\neq y} \{\log[f(x)]_i\} ,-\kappa \}\}
+l(x) = \max\{ \log[f(x)]_{y} - \max_{i\neq y} \{\log[f(x)]_i\} ,-\kappa \}
 \]
 for untargeted ones.
 %\todo{mutually improve this with Carlini-Wagner}
@@ -457,7 +456,7 @@ First, he samples a base instance \(b\), such that its class, the "base class", 
 p = \arg\min_x {\lvert \lvert g(x) - g(v) \rvert \rvert_{2}^2
 + \lambda \lvert \lvert x - b \rvert \rvert_{2}^2} 
 \]
-where \(g\) is the output of the networks second-to-last layer (i.e., the feature representation) and lambda is a constant. The first term compares the target v and poison candidates x in feature space (the more similar, the better), and the second penalises difference from the base instance. The general idea is to find a poison instance close to b, therefore likely to be labeled the same, yet close to v in feature space (output of second-to-last layer), so v is treated the same as b by the model. %Shafahi et al. argue that a suitable x can be found due to f being supposedly highly nonlinear. 
+where \(g\) is the output of the networks second-to-last layer (i.e., the feature representation) and \(\lambda\) is a constant. The first term compares the target v and poison candidates x in feature space (the more similar, the better), and the second penalises difference from the base instance. The general idea is to find a poison instance close to b, therefore likely to be labeled the same, yet close to v in feature space (output of second-to-last layer), so v is treated the same as b by the model. %Shafahi et al. argue that a suitable x can be found due to f being supposedly highly nonlinear. 
 For optimisation, two steps are iterated: First, a gradient step ("forward step"), then a step towards b ("backwards step").
 %\todo{FAIL graphic - similar}
 
