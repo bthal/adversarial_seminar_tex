@@ -130,7 +130,7 @@ The $L_2$ norm measures the Euclidean distance between the original and perturbe
 The $L_\infty$ norm limits the maximum change that can be applied to any individual feature~\cite{costa2024deep, liang2022adversarial}. Many influential attacks, including \textit{FGSM} and \textit{PGD}, operate under an $L_\infty$ constraint because it provides a straightforward approximation of perceptual similarity while enabling efficient optimisation~\cite{goodfellow2014explaining,madry2017towards}.
 
 \subsection{Notable Evasion Attacks}
-This section presents several notable adversarial attacks that have significantly influenced the development of the research area. An overview of these attacks, together with their classification according to the taxonomy introduced in Section~\ref{sec:taxonomy}, is provided in Table~\ref{table_with_all_attacks}. Throughout the following sections we follow the notation of the respective original papers; the same symbols (e.g.\ $\delta$, $\epsilon$, $\eta$, $f$) may therefore denote different quantities in different subsections.
+This section presents several notable adversarial attacks that have significantly influenced the development of the research area. An overview of these attacks, together with their classification according to the taxonomy introduced in Section~\ref{sec:taxonomy}, is provided in Table~\ref{table_with_all_attacks}. %Throughout the following sections we follow the notation of the respective original papers; the same symbols (e.g.\ $\delta$, $\epsilon$, $\eta$, $f$) may therefore denote different quantities in different subsections.
 
 \begin{table}[t]
 \centering
@@ -160,28 +160,28 @@ Narcissus~\cite{zeng2023narcissus}                      & Black-box & Poisoning 
 \subsubsection{L-BFGS}
 The first widely recognised adversarial attack was introduced by Szegedy et al.~\cite{szegedy2013intriguing}. Their work did not only show that machine learning models are vulnerable to inputs that lead to incorrect predictions while appearing unchanged to human observers, first describing the phenomenon of an adversarial example. They furthermore introduced a first reliable method to find such examples.
 
-To generate adversarial examples, the authors formulated the problem as a constrained optimisation task. Given an input $x$ and a target class $l$, the objective is to find the smallest perturbation $r$ such that the perturbed input $x+r$ is classified as the target class:
+To generate adversarial examples, the authors formulated the problem as a constrained optimisation task. Given an input $x$ and a target class $t$, the objective is to find the smallest perturbation $\delta$ such that the perturbed input $x+\delta$ is classified as the target class:
 
 \begin{equation}
-\min_r \|r\|_2
+\min_\delta \|\delta\|_2
 \quad \text{subject to} \quad
-f(x+r)=l,
+f(x+\delta)=t,
 \end{equation}
 
-where $f$ denotes the classifier and $\|r\|_2$ represents the Euclidean distance between the original and perturbed input. 
-Directly solving this problem is difficult since the classification constraint $f(x+r)=l$ is highly non-linear and non-convex. To make the problem handleable, Szegedy et al. reformulated it as a continuous optimisation problem by replacing the hard classification constraint with a differentiable loss term that encourages the model to predict the target class. Specifically, they minimise
+where $f$ denotes the classifier and $\|\delta\|_2$ represents the Euclidean distance between the original and perturbed input. 
+Directly solving this problem is difficult since the classification constraint $f(x+\delta)=t$ is highly non-linear and non-convex. To make the problem handleable, Szegedy et al. reformulated it as a continuous optimisation problem by replacing the hard classification constraint with a differentiable loss term that encourages the model to predict the target class. Specifically, they minimise
 
 \begin{equation}
-\min_r \; c\|r\|_2 + \mathrm{loss}_f(x+r,l),
+\min_\delta \; c\|\delta\|_2 + L_f(x+\delta,t),
 \end{equation}
 
 subject to the box constraint
 
 \begin{equation}
-x+r \in [0,1]^m,
+x+\delta \in [0,1]^m,
 \end{equation}
 
-where $\mathrm{loss}_f(x+r,l)$ measures how strongly the network predicts class $l$. The parameter $c>0$ controls the trade-off between achieving the target misclassification and keeping the perturbation small, and the box constraint ensures that the perturbed input remains a valid image. This reformulation yields a differentiable objective whose gradients can be computed via backpropagation, allowing the perturbation to be found efficiently using the box-constrained Limited-memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS) optimisation algorithm. A line search over $c$ is then performed to identify the smallest successful perturbation that causes the classifier to output the target class.
+where $L_f(x+r,t)$ measures how strongly the network predicts class $t$. The parameter $c>0$ controls the trade-off between achieving the target misclassification and keeping the perturbation small, and the box constraint ensures that the perturbed input remains a valid image. This reformulation yields a differentiable objective whose gradients can be computed via backpropagation, allowing the perturbation to be found efficiently using the box-constrained Limited-memory Broyden-Fletcher-Goldfarb-Shanno (L-BFGS) optimisation algorithm. A line search over $c$ is then performed to identify the smallest successful perturbation that causes the classifier to output the target class.
 
 Although the L-BFGS attack is still computationally expensive compared to later methods, its significance lies in motivating the extensive research that followed. For this reason, it is widely regarded as the starting point of adversarial machine learning research~\cite{goodfellow2014explaining, costa2024deep, liang2022adversarial}.
 
@@ -191,21 +191,21 @@ Goodfellow et al.\ hypothesized that the reason adversarial examples exist is th
 Based on this hypothesis, they came up with the fast gradient sign method to find $L_\infty$-constrained adversarial examples. $L_\infty$ is chosen because it models sensor inaccuracies: a small perturbation in a sensor value would still be encoded to the same digital value.%Under their reasoning that models are mostly linear, the functions they represent are mostly linear as well. That means that we can approximate them around a point x in input space using the gradient. Goodfellow et al %hypothesize that the cost function around this point also can be approximated this way since it (why??? How does this follow from before??)(This assumes that the cost function [...?] is mostly smooth? WARNING: MIGHT NOT BE 100% REASONABLE! ->PGD / is debateable). (when? go into detail!)
 Unlike L-BFGS, they did not choose a specific target class they want the adversarial example to be mistaken for. Instead, they aim to maximise the loss value of the adversarial example. That means that we want to solve 
 
-\[\arg\max_{x' s.t. \lvert \lvert x'-x \rvert \rvert_\infty \leq \delta} L(\theta, x', y) = x + \arg\max_{\lvert\lvert\eta\rvert\rvert_\infty\leq\delta}L(\theta, x+\eta, y)\]
+\[\arg\max_{x' s.t. \lvert \lvert x'-x \rvert \rvert_\infty \leq \epsilon} L_f(x', y) = x + \arg\max_{\lvert\lvert\delta\rvert\rvert_\infty\leq\epsilon}L_f(x+\delta, y)\]
 
-given a data point \(x\), a limit \(\delta\), and a loss function \(L(\theta, x, y)\), to find the 'worst' adversarial example (maximises loss) in the $L_\infty$-ball around $x$
+given a data point \(x\), a limit \(\epsilon\), and a loss function \(L_f(x, y)\) for the classifier \(f\), to find the 'worst' adversarial example (maximises loss) in the $L_\infty$-ball around $x$
 %\todo{cost vs loss function?? Rewrite without x', but with epsilon?}
 
 To do that, Goodfellow et al. linearise the loss function around $x$, giving us 
 
 \[
-\arg\max_{\lvert\lvert\eta\rvert\rvert_\infty\leq\delta}L(\theta, x+\eta, y) = 
-\arg\max_{\lvert\lvert\eta\rvert\rvert_\infty\leq\delta}L(\theta, x, y) + \nabla_x L(\theta, x, y)^T \eta =
-\arg\max_{\lvert\lvert\eta\rvert\rvert_\infty\leq\delta}\nabla_x L(\theta, x, y)^T \eta
+\arg\max_{\lvert\lvert\delta\rvert\rvert_\infty\leq\epsilon}L_f(x+\delta, y) = 
+\arg\max_{\lvert\lvert\delta\rvert\rvert_\infty\leq\epsilon}L_f(x, y) + \nabla_x L_f(x, y)^T \delta =
+\arg\max_{\lvert\lvert\delta\rvert\rvert_\infty\leq\epsilon}\nabla_x L_f(x, y)^T \delta
 \]
 %\[\max_{x' s.t. \lvert \lvert x'-x \rvert \rvert_\infty \leq \delta} L(\theta, x', y) = \max_{x' s.t. \lvert \lvert x'-x \rvert \rvert_\infty \leq \delta} L(\theta, x, y) + \nabla_x L(\theta, x, y)^T (x'-x) =L(\theta, x, y)\max_{\lvert\lvert\eta\rvert\rvert_\infty\leq\delta}\]%\[= \arg\max_{x' s.t. \lvert \lvert x'-x \rvert \rvert_\infty \leq \delta} \nabla_x L(\theta, x, y)^T x'\]
 %Choosing $\eta = \delta \cdot sign(\nabla_x L(\theta, x, y))$ is a valid maximiser, corresponding to a step in the direction of the sign of the gradient. \todo{reword this} This is why ... is known as the gradient sign method... results...
-We can easily see that $\eta = \delta \cdot sign(\nabla_x L(\theta, x, y))$ is a valid maximiser of the scalar product  $\nabla_x L(\theta, x, y)^T \eta$. This corresponds to a single, as large as possible step in the direction of the gradient.
+We can easily see that $\delta = \epsilon \cdot sign(\nabla_x L_f(x, y))$ is a valid maximiser of the scalar product  $\nabla_x L_f(x, y)^T \delta$. This corresponds to a single, as large as possible step in the direction of the gradient.
 
 %It revolves around linearising the cost function $L(\theta, x, y)$ around a point $x$ in input space to maximise it.
 
@@ -221,21 +221,21 @@ Since this approach only needs one backpropagation step instead of iterations li
 \subsubsection{Variants of FGSM}
 %\todo{One-step target class meths, cf DVERSARIAL MACHINE LEARNING AT SCALE}
 
-Different variants of FGSM were proposed by Kurakin et al.~\cite{kurakin2017physical,kurakin2017scale}.
+Different variants of FGSM were proposed by Kurakin et al.~\cite{kurakin2016adversarial, kurakin2017physical}.
 
 The so-called \textbf{basic iterative method} applies FGSM multiple times with a small step size \cite{kurakin2017physical}. The adversarial example is given by
 % !!! x X difference!!
 \[
-X_{0}^{adv} = X, \quad X_{N+1}^{adv} = Clip_{X,\epsilon}
+x_{0}^{adv} = x, \quad x_{N+1}^{adv} = Clip_{x,\epsilon}
 (
-X_{N}^{adv} + \alpha sign(\nabla_X L(X_{N}^{adv} , y_{true}))
+x_{N}^{adv} + \alpha \cdot sign(\nabla_X L(x_{N}^{adv} , y))
 )
 \]
-where \(Clip_{X,\epsilon}\) implements pixel-wise constriction to the \(\epsilon\)-neighborhood of \(X\) \cite{kurakin2017physical}.
+where \(Clip_{x,\epsilon}\) implements pixel-wise constriction to the \(\epsilon\)-neighborhood of \(x\) \cite{kurakin2017physical}.
 
-To find adversarial examples of a specific class \(y_{target}\) instead of maximising the loss function, FGSM can be modified to maximise that classes probability \(p(y_{target} | X)\). This can be achieved with a single step in direction of \(sign(\nabla_X log(p(y_{target} | X)))\) \cite{kurakin2017physical}
+To find adversarial examples of a specific class \(t\) instead of maximising the loss function, FGSM can be modified to maximise that classes probability \(p(t | x)\). This can be achieved with a single step in direction of \(sign(\nabla_X log(p(t | x)))\) \cite{kurakin2017physical}
 %loss function formulation for Crossentropy
-, analogous to basic FGSM, or using multiple, like in the aforementioned basic iterative method \cite{kurakin2017scale}. A popular choice for target class is the one originally deemed least likely by the target model.% [!!!] 
+, analogous to basic FGSM, or using multiple, like in the aforementioned basic iterative method \cite{kurakin2016adversarial}. As target class, the one originally deemed least likely by the target model can be used. 
 
 
 
@@ -247,10 +247,10 @@ Instead of using multiple FGSM steps, though, Madry et al. use projected gradien
 
 They formulate the adversary's goal as
 \[
-\max_{\eta\in S}L(\theta, x+\eta, y)
+\max_{\delta\in S}L_f(x+\delta, y)
 \]
 %\todo{include the dual formulation? Not that important for adv. attacks?} 
-Note the similarities to FGSM, by using \(S=\{\eta \mid \lVert \eta \rVert \leq \delta\}\), we obtain its maximization problem. FGSM is therefore a specific method to tackle this general formulation.
+Note the similarities to FGSM, by using \(S=\{\delta \mid \lVert \delta \rVert_\infty \leq \epsilon\}\), we obtain its maximization problem. FGSM is therefore a specific method to tackle this general formulation.
 
 As a generalised, stronger attack, they propose using PGD. They support their argument with an experiment, starting PGD from random points in the vicinity of \(x\). While many different local maxima are found, they have roughly the same loss value. If an even better maximum existed, they argue, it would be hard to find with any first-order method. Therefore, no other first-order method could find it in reasonable time either, making PGD a useful "universal" first-order adversary.
 
@@ -274,10 +274,10 @@ However, this strength has a caveat. As we will see with momentum-based attacks 
 which defines a locally linear decision boundary. The perturbation is obtained by projecting the current point onto this locally estimated boundary, yielding an update
 
 \begin{equation}
-    x_{i+1}=x_i+r_i,
+    x_{i+1}=x_i+\delta_i,
 \end{equation}
 
-where $r_i$ is the smallest perturbation that crosses the linearised boundary. The procedure is repeated until the classifier changes its prediction.
+where $\delta_i$ is the smallest perturbation that crosses the linearised boundary. The procedure is repeated until the classifier changes its prediction.
 
 For multiclass classifiers, DeepFool extends this idea by considering the set of pairwise decision boundaries between the current class and competing classes. At each iteration, the method computes the locally closest boundary under the linear approximation and updates the input toward that boundary. Figure~\ref{fig:deepfoolmulticlasslinearapproximation} visualises the iteration step.
 
@@ -296,20 +296,20 @@ The Carlini-Wagner (C\&W) attack is an influential attack presented by Carlini a
 Just like L-BFGS, given an input example $x$ and a target class $t$, the attack seeks an adversarial example $x'=x+\delta$ by solving:
 
 \begin{equation}
-\min_{\delta} \|\delta\|_p + c \cdot f(x+\delta),
+\min_{\delta} \|\delta\|_p + c \cdot l(x+\delta),
 \end{equation}
 
-where $\|\delta\|_p$ measures the size of the perturbation and $f$ is a logit-based loss function that operates on the network's raw logits rather than the softmax output probabilities. The loss is defined as:
+where $\|\delta\|_p$ measures the size of the perturbation and $l$ is a logit-based loss function that operates on the network's raw logits rather than the softmax output probabilities. The loss is defined as:
 
 \begin{equation}
-f(x') =
+l(x') =
 \max \left(
-\max_{i \neq t} Z_i(x') - Z_t(x'),
+\max_{i \neq t} z_i(x') - z_t(x'),
 -k
 \right),
 \end{equation}
 
-where $Z_i(x')$ denotes the logit corresponding to class $i$, and $k$ is a confidence parameter controlling the margin by which the target class must exceed competing classes. This formulation directly optimises against the decision boundary of the classifier and thus efficiently calculates adversarial examples.
+where $z_i(x')$ denotes the logit corresponding to class $i$, and $k$ is a confidence parameter controlling the margin by which the target class must exceed competing classes. This formulation directly optimises against the decision boundary of the classifier and thus efficiently calculates adversarial examples.
 
 To address the pixel-range constraint of image inputs, the C\&W attack introduces a clever variable transformation:
 
@@ -337,7 +337,7 @@ Instead, they rely on a heuristic to find out in which input direction the (subs
 The first step is collecting a set of samples somewhat representative of the target's input domain, such as different natural images. After, the substitute architecture is defined based on input and output of the target, e.g. one adapted to images. The architecture is overall not a deciding factor in the success of this approach.
 The following steps are then performed repeatedly: The adversary makes the target model label his current selection of samples, and then trains his substitute with the new examples. Next, he augments his dataset with additional input points:
 
-Let \(J_f(x)\) be the Jacobian of the substitute at a point x. Then, \(J_f(x)[o(x)]\) is the column corresponding to partial derivatives of the correct label (i.e. the one assigned by the target model). Papernot et al. now add the sign of this column scaled by a factor \(\lambda\) to point x: \(x = x + \lambda sign(J_f(x)[o(x)])\), and add it to their dataset. The idea is to move the example along directions in which model output changes strongly, with the intuition that these directions need more samples to accurately model the target's decision boundaries.
+Let \(J_f(x)\) be the Jacobian of the substitute at a point x. Then, \(J_f(x)[o(x)]\) is the column corresponding to partial derivatives of the correct label (i.e. the one assigned by the target model). Papernot et al. now add the sign of this column scaled by a factor \(\alpha\) to point x: \(x = x + \alpha \cdot sign(J_f(x)[o(x)])\), and add it to their dataset. The idea is to move the example along directions in which model output changes strongly, with the intuition that these directions need more samples to accurately model the target's decision boundaries.
 
 By doing this to all current points, they obtain a larger sample set, so the model trained in the next iteration is closer to the target. Note that every epoch, the model is trained from scratch. With enough iterations, the substitute can then be used to generate the adversarial examples.
 % !!! check Jacobian definition
@@ -348,9 +348,9 @@ For transferability attacks to work, it is crucial that adversarial examples con
 They therefore propose that an adversary in the transfer attack setting crafts adversarial examples against an ensemble of models. For a targeted attack, they suggest the negative-log-likelihood-objective:
 
 \[
-x^{*} = \arg\min_{x'}{-\log((\sum_{i=1}^k \alpha_i J_i(x'))*\mathbb{1}_{y^{*}}) + \lambda \lVert x - x'\rVert}
+x^{*} = \arg\min_{x'}{-\log((\sum_{i=1}^k \beta_i f_i(x')) \cdot \mathbb{1}_{t}) + \lambda \frac{\lVert x - x'\rVert_2}{\sqrt{N}}}
 \]
-where \(J(*)\) is each models output, \(\alpha_i\) scaling factors for each such that \(\sum_i\alpha_i=1\), for example simply \(1/k\).
+where \(N\) is the number of dimensions, \(t\) is the target class, \(f_i(\cdot)\) is each models output, \(\beta_i\) scaling factors for each such that \(\sum_i\beta_i=1\), for example simply \(1/k\). As a whole, this formula balances maximizing the probability assigned to the target class (first part) and keeping the perturbation small (second part). The \(sqrt{N}\) serves as a normalisation factor for different input dimensions.
 
 \subsubsection{MI-FGSM and Momentum}
 \label{sssec:momentum}
@@ -360,13 +360,13 @@ To tackle this issue, Dong et al. \cite{dong2018boosting} proposed adding moment
 
 The gradient is updated as
 \[
-g_{t+1} = \mu * g_t + \frac{\nabla_x J(x_t^{*}, y)}{\lVert \nabla_x J(x_t^{*}, y) \rVert_1}
+g_{N+1} = \mu \cdot g_N + \frac{\nabla_x L_f(x_N^{*}, y)}{\lVert \nabla_x L_f(x_N^{*}, y) \rVert_1}
 \]
 with \(\mu\) being the decay factor and the gradient being normalised to handle gradient magnitudes varying over iterations.
 
 Accordingly, the sample is updated as
 \[
-x_{t+1}^{*} = x_t^{*} + \alpha * sign(g_{t+1})
+x_{N+1}^{*} = x_N^{*} + \alpha \cdot sign(g_{N+1})
 \]
 \(\alpha\) being the step size.
 For \(\mu=0\), this goes back to being normal FGSM. Note that this change is not restricted to FGSM, but can be applied to any iterative gradient-based method including targeted ones.
@@ -381,26 +381,26 @@ This attack is possible if the adversary is allowed to query the target model, i
 To circumvent this restriction, Chen et al. estimate a pseudo-gradient using two queries per coordinate:
 \[
 \hat{g_i}
-:= \frac{\partial f(x)}{\partial x_i}
-\approx \frac{f(x + he_i) - f(x - he_i)}{2h}
+:= \frac{\partial l(x)}{\partial x_i}
+\approx \frac{l(x + he_i) - l(x - he_i)}{2h}
 \]
-where f is a loss function defined on the model's output and h is set to a small constant instead of approaching 0 like in the derivation formula.
-Naively, this would suffice to estimate full gradients and perform gradient descent. However, this formula requires two evaluations per coordinate, $f(x + he_i)$ and $f(x - he_i)$. Since each pixel translates to three coordinates of input data, this is not a feasible approach.
+where \(l\) is a loss function based on the model's output and \(h\) is set to a small constant instead of approaching 0 like in the derivation formula.
+Naively, this would suffice to estimate full gradients and perform gradient descent. However, this formula requires two evaluations per coordinate, $l(x + he_i)$ and $l(x - he_i)$, each incorporating  a query to the model. Since each pixel translates to three coordinates of input data, this is not a feasible approach.
 
 Instead, Chen et al. perform stochastic coordinate descent, improving just a batch of coordinates at each step. This way, they do not need to estimate the full gradient each time, similar to how stochastic gradient descent only uses a batch of samples at each step. For the optimisation itself, they use ADAM or Newton's method.
 
-Still, we need to find a suitable loss function f. In fact, we can use different loss functions to adapt different white-box attacks. In their work, Chen et al. adapted the Carlini-Wagner attack. C-W's loss function performs on the raw logits of a model, an information inaccessible in the black-box case.
+Still, we need to find a suitable loss function \(l\). In fact, we can use different loss functions to adapt different white-box attacks. In their work, Chen et al. adapted the Carlini-Wagner attack. C-W's loss function performs on the raw logits of a model, an information inaccessible in the black-box case.
 
 Instead, Chen et al. use the logarithm of the confidence scores as a proxy of sorts for the logits %\todo{argue} 
 and obtain
 \[
 %f(x,t) = \max\left\{ \max_{i\neq t} \log[F(x)]_i - \log[F(x)]_t,-\kappa \right\}
-f(x,t) = \max\{ \max_{i\neq t} \{\log[F(x)]_i\} - \log[F(x)]_t,-\kappa \}
+l(x,t) = \max\{ \max_{i\neq t} \{\log[f(x)]_i\} - \log[f(x)]_t,-\kappa \}
 \]
 for targeted attacks and
 \[
 %f(x,t) = \max\left\{ \max_{i\neq t} \log[F(x)]_i - \log[F(x)]_t,-\kappa \right\}
-f(x,t) = \max\{ \log[F(x)]_{t_0} - \max_{i\neq t_0} \{\log[F(x)]_i\} ,-\kappa \}\}
+l(x) = \max\{ \log[f(x)]_{y} - \max_{i\neq y} \{\log[f(x)]_i\} ,-\kappa \}\}
 \]
 for untargeted ones.
 %\todo{mutually improve this with Carlini-Wagner}
@@ -450,14 +450,14 @@ Like Gu et al.'s attack, theirs also depends on hyperparameter choices only, wit
 \subsubsection{Clean-Label Backdoor Attacks}
 Notably, while the backdoor poisoning attack described by Chen et al. does not need access to the model, the adversary has to be able to assign arbitrary labels to samples, as does the one by Gu et al. However, this can be highly noticeable and alert human overseers to the attack or might just not be feasible in another way. Clean-label attacks  do not give such power to the adversary.
 
-One such attack was proposed by Shafahi et al. \cite{shafahi2018poison}. In contrast to Chen et al.'s attack, the adversary does know the model parameters, which might happen if the target model is based on a pretrained, freely accessible one. His goal is to have a target instance misclassified without modifying it, e.g. getting a malware script to bypass a ML antivirus. 
+One such attack was proposed by Shafahi et al. \cite{shafahi2018poison}. In contrast to Chen et al.'s attack, the adversary does know the model parameters, which might happen if the target model is based on a pretrained, freely accessible one. His goal is to have a target instance \(v\) misclassified without modifying it, e.g. getting a malware script to bypass a ML antivirus. 
 
-First, he chooses a base instance, such that its class, the "base class", is the one he wants the target instance to be classified as. With this, he crafts a poison instance $p$ by solving 
+First, he samples a base instance \(b\), such that its class, the "base class", is the one he wants the target instance to be classified as. With this, he crafts a poison instance $p$ by solving 
 \[
-p = \arg\min_x {\lvert \lvert f(x) - f(t) \rvert \rvert_{2}^2
-+ \beta \lvert \lvert x - b \rvert \rvert_{2}^2} 
+p = \arg\min_x {\lvert \lvert g(x) - g(v) \rvert \rvert_{2}^2
++ \lambda \lvert \lvert x - b \rvert \rvert_{2}^2} 
 \]
-where the first term compares the target t and poison candidates x in feature space (the more similar, the better), and the second penalises difference from the base instance. The general idea is to find a poison instance close to b, therefore likely to be labeled the same, yet close to t in feature space (output of second-to-last layer), so t is treated the same as b by the model. %Shafahi et al. argue that a suitable x can be found due to f being supposedly highly nonlinear. 
+where \(g\) is the output of the networks second-to-last layer (i.e., the feature representation) and lambda is a constant. The first term compares the target v and poison candidates x in feature space (the more similar, the better), and the second penalises difference from the base instance. The general idea is to find a poison instance close to b, therefore likely to be labeled the same, yet close to v in feature space (output of second-to-last layer), so v is treated the same as b by the model. %Shafahi et al. argue that a suitable x can be found due to f being supposedly highly nonlinear. 
 For optimisation, two steps are iterated: First, a gradient step ("forward step"), then a step towards b ("backwards step").
 %\todo{FAIL graphic - similar}
 
@@ -469,31 +469,30 @@ made an effort to combine the clean-label approach with backdoor poisoning attac
 % !!! images here?
 Saha et al. consider a threat model in which the adversary can add poison to a dataset the victim uses for fine-tuning a pretrained model, which the adversary has access to. The scenario is similar to the one described by Gu et al., with the difference that the adversary attacks the fine-tuning, not the pretraining.
 
-The attack itself is similar to Shafahi et al.'s. The adversary chooses a source and a target image from the data distribution. He then applies his trigger to the source, obtaining the patched source. Like before, the poison sample is optimised to be close to the target in pixel space (so it probably receives the target label) while close to the patched source in feature space (so the model has difficulties distinguishing them). Note that the roles of source and target are flipped in the notation compared to Shafahi et al.
+The attack itself is similar to Shafahi et al.'s. The adversary samples a source \(s\) and a base image \(b\) from the data distribution. He then applies his trigger to the source, obtaining the patched source. Like before, the poison sample is optimised to be close to the base image in pixel space (so it probably receives the same label) while close to the patched source in feature space (so the model has difficulties distinguishing them). Note that the Saha et al. call the base image the "target" instead.
 
-Let \(\tilde{s}\) be the patched source, \(t\) the target, and \(\epsilon\) a small, chosen threshold. Saha et al. optimise
+Let \(\tilde{s}\) be the patched source, \(b\) the base, and \(\epsilon\) a small, chosen threshold. Saha et al. optimise
 \[
-\arg\min_x{\lvert \lvert f(x) - f(\tilde{s}) \rvert \rvert_{2}^2} \quad\quad \textbf{s.t.} \quad \lvert \lvert x - t \rvert \rvert_{\infty} < \epsilon
+\arg\min_x{\lvert \lvert g(x) - g(\tilde{s}) \rvert \rvert_{2}^2} \quad\quad \textbf{s.t.} \quad \lvert \lvert x - b \rvert \rvert_{\infty} < \epsilon
 \]
-to obtain the poisoned sample x. Again, \(f\) is the output of the second-to-last layer, the feature space representation.
+to obtain the poisoned sample x. Again, \(g\) is the output of the second-to-last layer, the feature space representation.
 % !!! go more in detail about this look on NNs: "only last layer decides"?
 To optimise, they use projected gradient descent. However, in each optimisation step, a new randomly-patched source is selected so the backdoor generalises to arbitrary images and patch placements. %...% !!! ... multiple at once, 1:1 problem
 
 %Narcissus, Label-consistent
-A more recent work by Zeng et al. \cite{zeng2023narcissus} addresses the inefficiency of choosing arbitrary trigger patterns while restricting the adversary further. 
-They consider a black-box threat model where the adversary can only poison a small subset of the training data. The adversary chooses the target class and knows some examples in it. He also has general information on the task the victim model should perform, such as "face recognition", but not specifics like classes used. This enables the attacker to draw up more data instances related to the task, though they might not belong to the original data distribution and are therefore referred to as "public out of distribution (POOD) examples". This is especially easy in image or language tasks where lots of samples are available in the web.
+A more recent work by Zeng et al. \cite{zeng2023narcissus} addresses the inefficiency of choosing arbitrary trigger patterns, while restricting the adversary further. 
+They consider a black-box threat model where the adversary can only poison a small subset of the training data. The adversary chooses the target class \(t\) and knows some examples \(D_t\) in it. He also has general information on the task the victim model should perform, such as "face recognition", but not specifics like classes used. This enables the attacker to draw up more data instances related to the task, though they might not belong to the original data distribution and are therefore referred to as "public out of distribution (POOD) examples". This is especially easy in image or language tasks where lots of samples are available in the web.
 
-Their approach revolves around optimising the trigger pattern used under a constraint so it is harder to notice for humans. Previous work had the adversary craft poisoning samples with an arbitrarily-choosen trigger.
+Their approach revolves around optimising the trigger pattern used under a constraint so it is harder to notice for humans. Previous work had the adversary craft poisoning samples with an arbitrarily-choosen trigger (see above).
 % !!! - Only some prior work was made on this, such as LIRA...
 Suppose the attacker had access to the model the victim would obtain without poisoning. We call this model the oracle \(f_{orc}\). Recall that he also has access to a dataset of the target class \(D_t\). Zeng et al.'s approach is to choose a trigger \(\delta^{*}\) maximising the oracle's confidence on the target class, i.e. solving 
 \[
-\delta^{*} = \arg\min_{\delta\in\Delta}{\sum_{(x,t)\in D_t}{L(f_{orc}(x+\delta), t)}}
+\delta^{*} = \arg\min_{\delta\in S}{\sum_{(x,t)\in D_t}{L_{f_{orc}}(x+\delta, t)}}
 \]
-where \(\Delta\) is the set of allowed perturbations, e.g. the \(L_\infty\)-ball. This way, \(\delta^{*}\) itself is related to the target class, and adding it to any input increases the likelihood of that input being classified as the target class. 
-
+where \(S\) is the set of allowed perturbations, e.g. the \(L_\infty\)-ball. This way, \(\delta^{*}\) itself is related to the target class, and adding it to any input increases the likelihood of that input being classified as the target class. 
 However, the adversary does not have access to \(f_{orc}\). Instead, Zeng et al. propose training a surrogate model \(f_{sur}\) on the POOD data \(D_{POOD}\). The above equation becomes
 \[
-\delta^{*} = \arg\min_{\delta\in\Delta}{\sum_{(x,t)\in D_t}{L(f_{sur}(x+\delta), t)}}
+\delta^{*} = \arg\min_{\delta\in S}{\sum_{(x,t)\in D_t}{L_{f_{sur}}(x+\delta, t)}}
 \]
 
 Now, the attack works as follows. First, \(f_{sur}\) is trained using \(D_{POOD}\) and \(D_t\).
