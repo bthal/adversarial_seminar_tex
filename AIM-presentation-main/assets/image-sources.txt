@@ -1,0 +1,12 @@
+panda https://arxiv.org/abs/1412.6572
+gibbon https://arxiv.org/abs/1412.6572
+panda - gibbon https://arxiv.org/abs/1412.6572
+medical-imaging https://medicalimaging.na/uploads/images/15c6a7b52034fdc101167be20941f3d7e6e89557.jpg
+tesla-autopilot https://evsmarts.com/wp-content/uploads/2025/08/tesla-autonomous-car-march-2018male-driver-sleeping-behind-the-self-driving-1280x720.webp
+passport-egates https://static1.thetravelimages.com/wordpress/wp-content/uploads/2025/07/air-travellers-pass-through-automated-passport-border-control-e-gates-at-heathrow-airport-heathrow-and-britain-s-border-force-use-facial-recognition-technology.jpg
+
+cnn https://miro.medium.com/v2/resize:fit:1358/1*HTJY9zmAF43G7wPcLrjUTw.png
+svm https://miro.medium.com/v2/resize:fit:1358/1*TSjvQlDde90FQtoD9-9iHw.png
+decision-tree https://365datascience.com/resources/blog/rr6cuudl59r-decision-trees-image1.png
+dnn https://ekababisong.org/assets/demyst_dl/neural-network.jpg
+kNN https://serokell.io/files/un/unzg7l97.K-Nearest_Neighbors_pic9.png

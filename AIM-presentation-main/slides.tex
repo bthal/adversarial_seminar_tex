@@ -1,0 +1,357 @@
+% ===
+%
+% Adversarial Attacks (AA) --- Seminar talk
+% Robust Deep Learning Seminar, RWTH Aachen University
+%
+% Built on the official AIM beamer template by Jakob Bossek.
+% See demo.tex in this folder for a live reference of every macro.
+%
+% Build:  latexmk -pdf slides.tex
+% Clean:  latexmk -C
+%
+% ===
+
+\documentclass[t,english,aspectratio=169]{beamer}
+
+% include package import and macro definitions (paths relative to this file)
+\input{includes/preamble}
+\input{includes/rgb}
+\input{includes/macros/general}
+\input{includes/macros/commenting}
+
+% bibliography: reuse the report's bib file one level up
+\addbibresource{../bib.bib}
+
+% look for images in this folder's figures/ and assets/ subfolders, and in the
+% report root. Image provenance is recorded in assets/image-sources.txt.
+\graphicspath{
+  {figures/}
+  {assets/panda-gibbon/}
+  {assets/critical-ai-use/}
+  {assets/transferability/}
+  {../}
+}
+
+\usepackage{graphicx}
+
+% NOTE: the theme ships with an `outline' option, but beamerthemeAIM.sty never
+% forwards it to beamerinnerthemeAIM.sty, so it silently has no effect.
+% We therefore keep outline=0 and insert section outlines ourselves below.
+\usetheme[authorinfo=1, progress=1, outline=0]{AIM}
+
+% Taxonomy tag for a method slide: knowledge / stage / goal / constraint.
+% Pinned to the page's top-right corner, vertically level with the frame title.
+% Needs `remember picture' -> two compilation passes (latexmk handles this).
+% The offset is tuned to the AIM frametitle band and lines up whether or not
+% the slide carries a \framesubtitle.
+\newcommand{\taxobox}[4]{%
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=north east, draw=rwth-blue-75, fill=rwth-blue-10,
+          rounded corners, inner sep=4pt, font=\scriptsize]
+      at ($(current page.north east)+(-0.5cm,-0.42cm)$)
+      {#1 \;$\cdot$\; #2 \;$\cdot$\; #3 \;$\cdot$\; #4};
+  \end{tikzpicture}%
+}
+
+% Cumulative "arc of the field" recap. \arcframe{n} shows the first n methods.
+\newcommand{\arcframe}[1]{%
+  \begin{frame}[c]
+    \frametitle{The arc of the field}
+    \begin{itemize}
+      \item[2013] \textbf{L-BFGS} --- expensive, but proves existence
+      \ifnum#1>1\relax
+        \item[2016] \textbf{DeepFool} --- minimal perturbation via linear approximation
+      \fi
+      \ifnum#1>2\relax
+        \item[2017] \textbf{C\&W} --- reformulate as optimisation; breaks defences
+      \fi
+    \end{itemize}
+  \end{frame}%
+}
+
+\AtBeginSection[]{%
+  \begingroup
+  \setbeamertemplate{footline}{}
+  \begin{frame}[t]
+    \frametitle{Outline}
+    \tableofcontents[currentsection, subsectionstyle=show/show/hide]
+  \end{frame}
+  \endgroup
+  \addtocounter{framenumber}{-1}
+}
+
+% metadata (mirrors main.tex)
+\title[Adversarial Attacks]{Adversarial Attacks}
+\subtitle{Robust Deep Learning (Seminar)}
+\author[Thal \& Wrobel]{Bjarne Thal \and Marius Wrobel}
+\institute{
+  Dept.\ of Computer Science, RWTH Aachen University, Germany\\
+  \texttt{\{bjarne.thal, marius.wrobel\}@rwth-aachen.de}
+}
+\date{\small August 4, 2026}
+
+\titlegraphic{
+  \includegraphics[width=2cm]{figures/rwth-logo.png}
+}
+
+%%%pythonmarker
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\addtocounter{framenumber}{-1}
+
+% ==========================================================================
+% MOTIVATION  (no \section -> no outline slide before the hook)
+% ==========================================================================
+
+\begin{frame}
+  \frametitle{Two images}
+
+  \vfill
+  \begin{columns}[c]
+    \column{0.48\textwidth}
+    \centering
+    \includegraphics[height=0.58\textheight]{panda.png}
+
+    \column{0.48\textwidth}
+    \centering
+    \includegraphics[height=0.58\textheight]{gibbon.png}
+  \end{columns}
+  \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{Two images}
+
+  \vfill
+  \begin{columns}[c]
+    \column{0.48\textwidth}
+    \centering
+    \includegraphics[height=0.58\textheight]{panda.png}\\[6pt]
+    \textbf{panda}
+
+    \column{0.48\textwidth}
+    \centering
+    \includegraphics[height=0.58\textheight]{gibbon.png}\\[6pt]
+    \textbf{gibbon}
+  \end{columns}
+  \vfill
+\end{frame}
+
+\begin{frame}
+  \frametitle{A fragile foundation}
+
+  \ig{0.85}{panda_gibbon.png}
+
+  \vfill
+  \refer{Goodfellow et al., 2014}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Transferability}
+
+  \begin{columns}[c]
+    \column{0.54\textwidth}
+    \begin{itemize}[<+->]
+      \item An adversarial example crafted against \emph{one} model often fools
+            models it was never shown.
+      \item This survives a change of \textbf{architecture} --- and of
+            \textbf{training data}, initialisation, and hyperparameters.
+      \item This points to something deeper: the vulnerability appears to be
+            \textbf{inherent to the problem being learned}, not a defect of a particular
+            model, or even of a particular architecture.
+      \item[$\leadsto$] The attacker needs \textbf{no access} to the target.
+            Train your own model, attack that, and the perturbation carries over.
+    \end{itemize}
+
+    \column{0.42\textwidth}
+    \centering
+    \includegraphics[width=0.46\textwidth, height=0.21\textheight, keepaspectratio]{cnn.png}\hfill
+    \includegraphics[width=0.46\textwidth, height=0.21\textheight, keepaspectratio]{dnn.jpg}\\[8pt]
+    \includegraphics[width=0.46\textwidth, height=0.21\textheight, keepaspectratio]{svm.png}\hfill
+    \includegraphics[width=0.46\textwidth, height=0.21\textheight, keepaspectratio]{kNN.png}
+  \end{columns}
+
+  \vfill
+  \refer{Papernot et al., 2016}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Why this matters}
+
+  \begin{columns}[c]
+    \column{0.52\textwidth}
+    \begin{itemize}[<+->]
+      \item What we just saw exposes a \textbf{fundamental blind spot} --- the model
+            and the human are not looking at the same thing.
+      \item That raises hard questions about the \textbf{reliability} of systems we
+            already treat as dependable.
+      \item And it grows more pressing as these systems are woven ever deeper into
+            \textbf{everyday life}, where failures carry real consequences.
+    \end{itemize}
+
+    \column{0.44\textwidth}
+    \centering
+    \includegraphics[width=0.86\textwidth, height=0.24\textheight, keepaspectratio]{medical-imaging.jpg}\\[4pt]
+    \includegraphics[width=0.86\textwidth, height=0.24\textheight, keepaspectratio]{tesla-autopilot.png}\\[4pt]
+    \includegraphics[width=0.86\textwidth, height=0.24\textheight, keepaspectratio]{passport-egates.jpg}
+  \end{columns}
+
+  \vfill
+  {\tiny\refer{Images: medicalimaging.na; evsmarts.com; thetravelimages.com}}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Outline}
+  \tableofcontents
+\end{frame}
+
+% ==========================================================================
+\section{What is an adversarial example?}
+% ==========================================================================
+
+\begin{frame}
+  \frametitle{Definition}
+
+  \begin{block}{Definition 1 (Adversarial Example)}
+    An \emph{adversarial example} is an \textbf{input to a machine learning model}
+    that has been \textbf{intentionally perturbed}, typically \textbf{in a subtle
+    and often imperceptible manner}, such that the model produces an incorrect
+    prediction while the semantic content of the input remains unchanged.
+  \end{block}
+
+  \pause
+  \begin{itemize}
+    \item \textbf{Machine learning models} --- no quirk of deep networks, but a general
+          property of machine learners.
+    \item \textbf{Intentional perturbations} --- generated systematically through
+          optimisation and exploited by an adversary, not stumbled upon.
+    \item \textbf{Subtle and imperceptible perturbations} --- mathematically small under
+          a chosen norm, and visually indistinguishable to humans; the latter is
+          asserted far more often than it is rigorously validated.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Measuring ``small'': the $\ell_p$ norms}
+
+  \vfill
+  \centering
+  \includegraphics[width=0.95\textwidth, height=0.62\textheight, keepaspectratio]{norms.png}
+
+  \vskip12pt
+  The norm defines the \textbf{perturbation budget} $\epsilon$ and, with it,
+  what ``similar'' even means.
+  \vfill
+\end{frame}
+
+% ==========================================================================
+\section{Taxonomy}
+% ==========================================================================
+
+\begin{frame}[c]
+  \frametitle{Four orthogonal axes}
+
+  \begin{itemize}
+    \item \textbf{Attacker knowledge} --- white-box vs.\ black-box
+    \item \textbf{Attack stage} --- evasion (test time) vs.\ poisoning (train time)
+    \item \textbf{Attack goal} --- targeted vs.\ untargeted
+    \item \textbf{Perturbation constraint} --- which norm, which budget
+  \end{itemize}
+
+\end{frame}
+
+% ==========================================================================
+\section{Evasion attacks}
+% ==========================================================================
+
+\begin{frame}
+  \frametitle{L-BFGS}
+
+  \taxobox{White-box}{Evasion}{Targeted}{$\ell_2$}
+\end{frame}
+
+\arcframe{1}
+
+\begin{frame}
+  \frametitle{DeepFool}
+
+  \taxobox{White-box}{Evasion}{Untargeted}{$\ell_2$}
+\end{frame}
+
+\arcframe{2}
+
+\begin{frame}
+  \frametitle{Carlini \& Wagner}
+
+  \taxobox{White-box}{Evasion}{Targeted}{$\ell_0 / \ell_2 / \ell_\infty$}
+\end{frame}
+
+\arcframe{3}
+
+% ==========================================================================
+% Kept as an outline entry only --- slides to be added later.
+\section{Poisoning attacks}
+% ==========================================================================
+
+% ==========================================================================
+\section{Discussion}
+% ==========================================================================
+
+\subsection{Physical adversarial attacks}
+
+\begin{frame}
+  \frametitle{Physical adversarial attacks}
+\end{frame}
+
+\subsection{Real-life adversarial attacks}
+
+\begin{frame}
+  \frametitle{Real-life adversarial attacks}
+\end{frame}
+
+\subsection{Explaining adversarial examples}
+
+\begin{frame}
+  \frametitle{Explaining adversarial examples}
+\end{frame}
+
+\subsection{Adversarial attacks as a subject of study}
+
+\begin{frame}
+  \frametitle{Adversarial attacks as a subject of study}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Take-home messages}
+
+  \begin{itemize}
+    \item[] % to be filled in
+  \end{itemize}
+\end{frame}
+
+\appendix
+
+% ==========================================================================
+% REFERENCES
+% ==========================================================================
+
+\begin{frame}[allowframebreaks]
+  \frametitle{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+% ==========================================================================
+% BACKUP
+% ==========================================================================
+
+\begin{frame}
+  \frametitle{Backup: attack comparison}
+
+  \end{frame}
+
+\end{document}
