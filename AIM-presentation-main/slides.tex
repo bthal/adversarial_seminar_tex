@@ -29,6 +29,7 @@
   {assets/panda-gibbon/}
   {assets/critical-ai-use/}
   {assets/transferability/}
+  {assets/deepfool/}
   {../}
 }
 
@@ -53,17 +54,23 @@
   \end{tikzpicture}%
 }
 
+% Significance box --- used on the closing slide of every attack to state, in
+% 1--3 bullets, what the technique is remembered for and why it matters.
+\newenvironment{significance}
+  {\begin{exampleblock}{Significance}\begin{itemize}}
+  {\end{itemize}\end{exampleblock}}
+
 % Cumulative "arc of the field" recap. \arcframe{n} shows the first n methods.
 \newcommand{\arcframe}[1]{%
   \begin{frame}[c]
     \frametitle{The arc of the field}
     \begin{itemize}
-      \item[2013] \textbf{L-BFGS} --- expensive, but proves existence
+      \item[2013] \textbf{L-BFGS} --- expensive, but proves concept
       \ifnum#1>1\relax
-        \item[2016] \textbf{DeepFool} --- minimal perturbation via linear approximation
+        \item[2016] \textbf{DeepFool} --- minimal perturbation via iterative linear approximation
       \fi
       \ifnum#1>2\relax
-        \item[2017] \textbf{C\&W} --- reformulate as optimisation; breaks defences
+        \item[2017] \textbf{C\&W} --- reformulate optimisation
       \fi
     \end{itemize}
   \end{frame}%
@@ -273,14 +280,99 @@
   \frametitle{L-BFGS}
 
   \taxobox{White-box}{Evasion}{Targeted}{$\ell_2$}
+
+  \begin{block}{}
+    \begin{align*}
+      \min_{\delta} \; \|\delta\|_2
+      \qquad \text{subject to} \qquad
+      f(x + \delta) = t
+    \end{align*}
+  \end{block}
+
+  \begin{itemize}
+    \item $f$ has no gradient --- it returns a discrete class label,  $f(x+\delta) = t$ is a hard, non-differentiable condition.
+    \item Derivative-based optimisers such as L-BFGS need a gradient to move at all.
+    \item[$\leadsto$] Reformulate.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{L-BFGS}
+
+  \taxobox{White-box}{Evasion}{Targeted}{$\ell_2$}
+
+  \begin{block}{}
+    \begin{align*}
+      \min_{\delta} \; c \, \|\delta\|_2 + L_f(x + \delta,\, t)
+    \end{align*}
+  \end{block}
+
+  \begin{significance}
+    \item First method to \textbf{reliably generate} adversarial examples.
+    \item Computationally expensive --- far too slow to be practical.
+    \item[$\leadsto$] It \emph{proved a point} rather than providing a usable attack.
+  \end{significance}
 \end{frame}
 
 \arcframe{1}
 
 \begin{frame}
   \frametitle{DeepFool}
+  \framesubtitle{The affine, binary case}
 
   \taxobox{White-box}{Evasion}{Untargeted}{$\ell_2$}
+
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+    \begin{itemize}
+      \item For an affine $f(x) = w^\top x + b$, the decision boundary
+            $\mathcal{F}$ is a \textbf{hyperplane}.
+      \item Minimal perturbation is the \textbf{orthogonal projection} of $x_0$
+            onto $\mathcal{F}$ --- closed form, no search.
+    \end{itemize}
+
+    \vskip-2pt
+    \begin{block}{}
+      \vskip-6pt
+      \begin{align*}
+        r_*(x_0) = -\,\frac{f(x_0)}{\|w\|_2^{2}}\, w
+      \end{align*}
+      \vskip-6pt
+    \end{block}
+
+    \column{0.43\textwidth}
+    \centering
+    \includegraphics[width=\textwidth, height=0.46\textheight, keepaspectratio]{affine-monoclass.png}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{DeepFool}
+  \framesubtitle{The general, multiclass case}
+
+  \taxobox{White-box}{Evasion}{Untargeted}{$\ell_2$}
+
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+    \begin{itemize}
+      \item \textbf{Non-linear:} iterative -> linearise the
+            score function at current point (first-order Taylor), project onto that
+            hyperplane, repeat until label flips.
+      \item \textbf{Multiclass:}
+            Linearise \emph{every} class boundary, project onto the \textbf{closest}.
+    \end{itemize}
+
+    \column{0.43\textwidth}
+    \centering
+    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{nonlinear-multiclass.png}
+  \end{columns}
+
+  \vskip2pt
+  \begin{significance}
+    \item Gave problem a \textbf{geometric reading}: robustness as distance
+          to the decision boundary.
+    \item First to \textbf{extend to any $\ell_p$ norm}, $p \in [1, \infty)$.
+  \end{significance}
 \end{frame}
 
 \arcframe{2}
@@ -289,6 +381,44 @@
   \frametitle{Carlini \& Wagner}
 
   \taxobox{White-box}{Evasion}{Targeted}{$\ell_0 / \ell_2 / \ell_\infty$}
+
+  \begin{block}{}
+    \begin{align*}
+      \underbrace{\min_{\delta}\; c\,\|\delta\|_2 + L_f(x+\delta,\, t)}_{\text{L-BFGS}}
+      \qquad\longrightarrow\qquad
+      \underbrace{\min_{\delta}\; \|\delta\|_p + c\cdot \ell(x+\delta)}_{\text{C\&W}}
+    \end{align*}
+  \end{block}
+
+  \begin{itemize}
+    \item $\;\ell(x') = \max\!\big(\max_{i\neq t} z_i(x') - z_t(x'),\; 0\big)$.
+    \item Built so that $\ell(x') \le 0 \iff$ input is classified as $t$ -> faithfully encodes the attack goal.
+    \item $c$ decided through \textbf{binary search}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Carlini \& Wagner}
+
+  \taxobox{White-box}{Evasion}{Targeted}{$\ell_0 / \ell_2 / \ell_\infty$}
+
+  \begin{block}{}
+    \begin{align*}
+      x' = \tfrac{1}{2}\big(\tanh(w) + 1\big),
+      \qquad w \in \mathbb{R}^m
+    \end{align*}
+  \end{block}
+
+  \begin{itemize}
+    \item mapping any $w \in \mathbb{R}^m$ into $(0,1)^m$ -> every $w$
+          decodes to a \textbf{valid image} -> dissolving box-constraint
+    \item Optimise $w$ \textbf{unconstrained} with Adam optimiser
+  \end{itemize}
+
+  \begin{significance}
+    \item Strongest attack of its time across $\ell_0 / \ell_2 / \ell_\infty$.
+    \item Broke \emph{defensive distillation}, exposing it as \emph{gradient masking}
+  \end{significance}
 \end{frame}
 
 \arcframe{3}
