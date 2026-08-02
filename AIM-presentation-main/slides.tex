@@ -317,6 +317,69 @@
 \arcframe{1}
 
 \begin{frame}
+  \frametitle{Fast Gradient Sign Method}
+
+  \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
+  \begin{block}{}
+    
+  \end{block}
+  \begin{itemize}
+    \item Previously: Adversarial examples assumed to be caused by 'complex' behaviour
+    \item Goodfellow et al.: Linear models have adv. ex. as well
+    \item[$\leadsto$] Models may be too linear
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Do Neural Networks behave linearly?}
+
+  %\taxobox{White-box}{Evasion}{Targeted}{$\ell_\infty$}
+  \begin{block}{}
+    ...
+  \end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Fast Gradient Sign Method}
+
+  \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
+  
+  \begin{itemize}
+    \item Linearise the loss function:
+    \begin{block}{}
+    \[
+      \arg\max_{\lvert\lvert\delta\rvert\rvert_\infty\leq\epsilon}L_f(x+\delta, y) = 
+      \arg\max_{\lvert\lvert\delta\rvert\rvert_\infty\leq\epsilon}L_f(x, y) + \nabla_x L_f(x, y)^T \delta
+    \]
+    \end{block}
+    \item Maximised by $\delta = \epsilon \cdot sign(\nabla_x L_f(x, y))$
+    \item[$\leadsto$] single step in gradient direction
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Fast Gradient Sign Method - Example}
+
+  \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
+  
+  \begin{block}{}
+    placeholder: step graph here
+    \end{block}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{[Results/Significance]}
+
+  \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
+  
+  \begin{itemize}
+    \item Maximised by $\delta = \epsilon \cdot sign(\nabla_x L_f(x, y))$
+    \item[$\leadsto$] single step in gradient direction
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
   \frametitle{DeepFool}
   \framesubtitle{The affine, binary case}
 
