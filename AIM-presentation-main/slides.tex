@@ -380,6 +380,32 @@
 \end{frame}
 
 \begin{frame}
+  \frametitle{PGD}
+
+  \taxobox{White-box}{Evasion}{???}{???}
+  \begin{block}{}
+    General formulation of adversarial training [...! incl. defenders part?]. Adversary solves
+    \[
+    \max_{\delta\in S}L_f(x+\delta, y)
+    \]
+  \end{block}
+  \begin{itemize}
+    \item FGSM: Use \(S=\{\delta \mid \lVert \delta \rVert_\infty \leq \epsilon\}\)
+    \item Use projected gradient descent to optimise
+    \item[$\leadsto$] Models may be too linear
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{PGD - a general first-order attack?}
+
+  \taxobox{White-box}{Evasion}{???}{???}
+  
+\end{frame}
+
+
+
+\begin{frame}
   \frametitle{DeepFool}
   \framesubtitle{The affine, binary case}
 
