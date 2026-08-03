@@ -363,14 +363,15 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{[Results/Significance]}
+  \frametitle{FGSM: Significance}
   \framesubtitle{\cite{goodfellow2014explaining}}
 
   \taxobox{White-box}{Evasion}{Untargeted}
   
   \begin{itemize}
-    \item Maximised by $\delta = \epsilon \cdot sign(\nabla_x L_f(x, y))$
-    \item[$\leadsto$] Single step in gradient direction
+    \item Much faster than L-BFGS
+    \item[$\leadsto$] Made adversarial training feasible
+    \item Introduced different way of thinking about adversarial examples
   \end{itemize}
 \end{frame}
 
