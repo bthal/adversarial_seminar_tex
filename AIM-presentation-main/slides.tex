@@ -593,7 +593,7 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
 
   \begin{itemize}
     \item Goal: get ML model to misclassify any sample with trigger pattern into target class \(t\)
-    \item Similar threat model to Poison Frogs
+    \item Assumption: model based on pretrained weights known to the attacker, access to data distribution
     \item Restriction: adversary cannot choose labels
     \item -> "clean-label attack"
   \end{itemize}
