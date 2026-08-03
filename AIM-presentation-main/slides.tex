@@ -659,21 +659,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Proposed loss function}
 
-  \taxobox{Black-box}{Evasion}{Targ./Untarg.}
-
-  \begin{itemize}
-    \item Reminder: Carlini-Wagner loss:
-      \(\;\ell(x') = \max\!\big(\max_{i\neq t} z_i(x') - z_t(x'),\; 0\big)\) 
-    \item Targeted ZOO: \(l(x,t) = \max\{ \max_{i\neq t} \{\log[f(x)]_i\} - \log[f(x)]_t,-\kappa \}\)
-    \item Untargeted ZOO: \(l(x) = \max\{ \log[f(x)]_{y} - \max_{i\neq y} \{\log[f(x)]_i\} ,-\kappa \}\)
-  \end{itemize}
-  \begin{itemize}
-    \item \(log\) to estimate logits
-  \end{itemize}
-\end{frame}
 
 % ==========================================================================
 % Kept as an outline entry only --- slides to be added later.
@@ -920,6 +906,23 @@ Taken from [!!!].
 % \AtBeginSection and emit a stray Outline slide inside the appendix.
 \AtBeginSection[]{}
 \section{Backup Slides}
+
+
+\begin{frame}
+  \frametitle{ZOO: Proposed loss function}
+
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}
+
+  \begin{itemize}
+    \item Reminder: Carlini-Wagner loss:
+      \(\;\ell(x') = \max\!\big(\max_{i\neq t} z_i(x') - z_t(x'),\; 0\big)\) 
+    \item Targeted ZOO: \(l(x,t) = \max\{ \max_{i\neq t} \{\log[f(x)]_i\} - \log[f(x)]_t,-\kappa \}\)
+    \item Untargeted ZOO: \(l(x) = \max\{ \log[f(x)]_{y} - \max_{i\neq y} \{\log[f(x)]_i\} ,-\kappa \}\)
+  \end{itemize}
+  \begin{itemize}
+    \item \(log\) to estimate logits
+  \end{itemize}
+\end{frame}
 
 % \sectionpage would work now, but the theme's template wraps a \paperheight
 % minipage that overflows the frame by ~5.7pt. \plainframe is the template's own
