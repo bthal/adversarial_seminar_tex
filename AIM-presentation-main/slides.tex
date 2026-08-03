@@ -279,7 +279,7 @@
   \end{block}
 
   \begin{itemize}
-    \item $f$ has no gradient --- it returns a discrete class label,  $f(x+\delta) = t$ is a hard, non-differentiable condition
+    \item $f$ has no gradient $\rightarrow$ it returns a discrete class label,  $f(x+\delta) = t$ is a hard, non-differentiable condition
     \item Derivative-based optimisers such as L-BFGS need a gradient to move at all
     \item[$\leadsto$] Reformulate
   \end{itemize}
@@ -299,7 +299,7 @@
 
   \begin{significance}
     \item First method to \textbf{reliably generate} adversarial examples
-    \item Computationally expensive --- far too slow to be practical
+    \item Computationally expensive &$\rightarrow$& far too slow to be practical
     \item[$\leadsto$] It \emph{proved a point} rather than providing a usable attack
   \end{significance}
 \end{frame}
@@ -435,7 +435,7 @@
 
 \begin{frame}
   \frametitle{DeepFool}
-  \framesubtitle{\cite{moosavi2016deepfool} --- the affine, binary case}
+  \framesubtitle{\cite{moosavi2016deepfool} - the affine, binary case}
 
   \taxobox{White-box}{Evasion}{Untargeted}
 
@@ -455,7 +455,7 @@
 
 \begin{frame}
   \frametitle{DeepFool}
-  \framesubtitle{\cite{moosavi2016deepfool} --- the general, multiclass case}
+  \framesubtitle{\cite{moosavi2016deepfool} - the general, multiclass case}
 
   \taxobox{White-box}{Evasion}{Untargeted}
 
@@ -708,9 +708,9 @@ Taken from \cite{saha2020hidden}.
   \frametitle{Explaining adversarial examples}
 
   \begin{itemize}[<+->]
-    \item[2013] \textbf{Szegedy et al.} --- quirks of non-linearity
-    \item[2014] \textbf{Goodfellow et al.} --- high-dimensional linearity
-    \item[2019] \textbf{Ilyas et al.} --- predictive but non-robust features
+    \item[2013] \textbf{Szegedy et al.} - quirks of non-linearity
+    \item[2014] \textbf{Goodfellow et al.} - high-dimensional linearity
+    \item[2019] \textbf{Ilyas et al.} - predictive but non-robust features
   \end{itemize}
 \end{frame}
 
