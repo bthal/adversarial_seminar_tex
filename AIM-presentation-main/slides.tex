@@ -316,10 +316,29 @@
   \end{block}
   \begin{itemize}
     \item Previously: Adversarial examples assumed to be caused by 'complex' behaviour
-    \item Goodfellow et al.: Linear models have adv. ex. as well
+    \item Goodfellow et al.: Linear models have adversarial examples as well
     \item[$\leadsto$] Models may be too linear
   \end{itemize}
 \end{frame}
+
+\begin{frame}
+  \frametitle{High-dimensional linearity}
+  \framesubtitle{\cite{goodfellow2014explaining}}
+
+  \begin{itemize}[<+->]
+      \item Linear model \(w^\top {x}\) perturbed by \(\delta\), \(\lVert \delta \rVert_\infty \leq \epsilon\):
+      \(w^\top {x+\delta} = w^\top {x} + w^\top \delta\)
+      \item Perturbation shifts activation by \(w^\top \delta\)
+      \item Best strategy: $\delta$ aligned with the weights, then:
+      \(w^\top \delta = \epsilon \sum_{i=1}^{n} |w_i| = \epsilon \, m \, n\)
+      \item Score change scales \emph{linearly} with number of dimensions
+      \item[$\leadsto$] Many imperceptible changes accumulate into
+            one large shift
+    \end{itemize}
+
+    
+\end{frame}
+
 
 \begin{frame}
   \frametitle{Do Neural Networks behave linearly?}
@@ -369,81 +388,14 @@
   \taxobox{White-box}{Evasion}{Untargeted}
   
   \begin{itemize}
-    \item Much faster than L-BFGS
+    \item Much faster than L-BFGS: Single step only
     \item[$\leadsto$] Made adversarial training feasible
     \item Introduced different way of thinking about adversarial examples
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{High-dimensional linearity}
-  \framesubtitle{\cite{goodfellow2014explaining}}
 
-  \begin{columns}[c]
-    \column{0.47\textwidth}
-    \begin{itemize}[<+->]
-      \item Affine case first: perturbation shifts activation by $w^\top\eta$
-      \item Best strategy: $\eta$ aligned with the weights
-      \item Score change scales \emph{linearly} with number of dimensions w.r.t. input change
-      \item[$\leadsto$] Many imperceptible changes accumulate into
-            one large shift
-    \end{itemize}
 
-    \column{0.50\textwidth}
-    \centering
-    \begin{tikzpicture}[>=stealth, x=0.72cm, y=0.72cm]
-      % decision boundary
-      \draw[rwth-blue-100, thick] (-0.15,0.225) -- (4.15,2.375);
-      \node[rwth-blue-100, font=\tiny, above left] at (4.15,2.30) {$w^\top x + b = 0$};
-      % w is the normal of the boundary -- shown for reference
-      \draw[->, rwth-black-50] (0.60,0.60) -- (0.198,1.405);
-      \node[rwth-black-50, font=\tiny, left] at (0.21,1.42) {$w$};
-      % x sits on the positive side; stepping along -w crosses by the shortest route
-      \draw[->, rwth-red-100, thick] (1.77,2.00) -- (2.40,0.75);
-      \node[rwth-red-100, font=\tiny, right] at (2.18,1.46) {$\eta = -\epsilon \operatorname{sign}(w)$};
-      \fill[rwth-black-100] (1.77,2.00) circle (1.7pt);
-      \node[rwth-black-100, font=\tiny, above left] at (1.82,2.06) {$x$};
-      \fill[rwth-red-100] (2.40,0.75) circle (1.7pt);
-      \node[rwth-red-100, font=\tiny, below] at (2.45,0.68) {$\tilde{x}$};
-    \end{tikzpicture}
-
-    \vskip2pt
-    \begin{block}{}
-      \vskip-10pt
-      \begin{align*}
-        w^\top \tilde{x} &= w^\top (x + \eta) \\
-                         &= w^\top x + w^\top \eta \\[3pt]
-        w^\top \eta &= \epsilon \sum_{i=1}^{n} |w_i| = \epsilon \, m \, n
-      \end{align*}
-      \vskip-10pt
-    \end{block}
-
-    {\tiny\refer{$n$ dimensions, mean weight magnitude $m$}}
-  \end{columns}
-\end{frame}
-
-\begin{frame}
-  \frametitle{From linear models to deep networks}
-  \framesubtitle{\cite{goodfellow2014explaining}}
-
-  \begin{columns}[c]
-    \column{0.47\textwidth}
-    \begin{itemize}[<+->]
-      \item Most DNN architectures behave \emph{locally linearly} for ease of optimisation
-      \item[$\leadsto$] Within $\epsilon$-ball, the linear argument carries over 
-    \end{itemize}
-
-    \column{0.50\textwidth}
-    \centering
-    \begin{tikzpicture}[every node/.style={inner sep=1.5pt}]
-      \node[rwth-blue-100,   font=\Large\bfseries] at (0.10, 1.55) {ReLU};
-      \node[rwth-petrol-100, font=\large]          at (2.55, 1.70) {LSTM};
-      \node[rwth-maroon-75,  font=\normalsize]     at (4.05, 0.95) {maxout};
-      \node[rwth-violet-75,  font=\small]          at (0.55, 0.75) {sigmoid near zero};
-      \node[rwth-green-75,   font=\normalsize]     at (3.15, 0.15) {linear-softmax};
-    \end{tikzpicture}
-  \end{columns}
-\end{frame}
 
 \attackframe{Projected Gradient Descent (PGD)}
 
@@ -470,6 +422,11 @@
   \framesubtitle{\cite{madry2017towards}}
 
   \taxobox{White-box}{Evasion}{???}
+  \begin{itemize}
+    \item Random runs show different maxima, but similar loss values
+    \item[$\leadsto$] If better solution exists: difficult to find using first-order methods
+    \item Especially relevant for adversarial defenses
+  \end{itemize}
   
 \end{frame}
 
