@@ -19,3 +19,4 @@ adversarial-glasses Sharif et al. 2016 -> Accessorize to a Crime: Real and Steal
 adversarial-turtle Athalye et al. 2018 -> Synthesizing Robust Adversarial Examples
 cifar-dog  genuine CIFAR-10 dog, extracted from Ilyas et al. 2019 Fig. 2 (row D) via pdfimages
 cat-cifar-style  cat from Ilyas et al. 2019 Fig. 1 (conceptual diagram, NOT a CIFAR-10 tile); downsampled to 32x32 and nearest-upscaled to match the CIFAR dog
+panda-gibbon-reduced  panda_gibbon.png (Goodfellow et al. 2014) with the formula row excised and the middle label/confidence blanked
