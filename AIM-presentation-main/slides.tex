@@ -403,7 +403,7 @@
   \frametitle{PGD}
   \framesubtitle{\cite{madry2017towards}}
 
-  \taxobox{White-box}{Evasion}{???}
+  \taxobox{White-box}{Evasion}{Untargeted}
   \begin{block}{}
     General formulation of adversarial training [...! incl. defenders part?]. Adversary solves
     \[
@@ -421,7 +421,7 @@
   \frametitle{PGD - a general first-order attack?}
   \framesubtitle{\cite{madry2017towards}}
 
-  \taxobox{White-box}{Evasion}{???}
+  \taxobox{White-box}{Evasion}{Untargeted}
   \begin{itemize}
     \item Random runs show different maxima, but similar loss values
     \item[$\leadsto$] If better solution exists: difficult to find using first-order methods
@@ -499,7 +499,7 @@
   \frametitle{Jacobian-Based Dataset Augmentation}
   \framesubtitle{\cite{papernot2017practical}}
 
-  \taxobox{Black-box}{Evasion}{???}
+  \taxobox{Black-box}{Evasion}{-}
 
   \begin{itemize}
     \item Assumption: No knowledge of model parameters, dataset 
@@ -513,7 +513,7 @@
   \frametitle{Jacobian-Based Dataset Augmentation}
   \framesubtitle{\cite{papernot2017practical}}
 
-  \taxobox{Black-box}{Evasion}{???}
+  \taxobox{Black-box}{Evasion}{-}
 
   \begin{itemize}
     \item Use target model as an oracle to label samples 
@@ -527,7 +527,7 @@
   \frametitle{Heuristic for meaningful directions}
   \framesubtitle{\cite{papernot2017practical}}
 
-  \taxobox{Black-box}{Evasion}{???}
+  \taxobox{Black-box}{Evasion}{-}
 
   \begin{block}{}
     \begin{align*}
@@ -547,7 +547,7 @@
   \frametitle{Jacobian-Based Dataset Augmentation}
   \framesubtitle{\cite{papernot2017practical}}
 
-  \taxobox{Black-box}{Evasion}{???}
+  \taxobox{Black-box}{Evasion}{-}
 
   \begin{itemize}
     \item 1) Collect samples somewhat related to the input domain
@@ -559,16 +559,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{White-box attacks to improve transferability}
 
-  \begin{itemize}
-    \item Adversarial examples can differ in transferability!
-    \item MI-FGSM: adds momentum to FGSM
-    \item Ensemble attacks
-    
-  \end{itemize}
-\end{frame}
 
 \attackframe{ZOO}
 
@@ -599,7 +590,7 @@
   \begin{itemize}
     \item \(l\) loss function based on confidence scores
     \item Two queries per coordinate, full gradient infeasible
-    \item -> Coordinate descent using first and/or second-order method
+    \item[$\leadsto$] Coordinate descent% using first and/or second-order method
   \end{itemize}
 \end{frame}
 
@@ -614,13 +605,12 @@
 \begin{frame}
   \frametitle{Hidden Trigger Backdoor Attack}
 
-  \taxobox{Black-box}{???}{}
+  \taxobox{White-box}{Poisoning}{Targeted}
 
   \begin{itemize}
     \item Goal: get ML model to misclassify any sample with trigger pattern into target class \(t\)
     \item Assumption: model based on pretrained weights known to the attacker, access to data distribution
-    \item Restriction: adversary cannot choose labels
-    \item -> "Clean-label attack"
+    \item Restriction: adversary cannot choose labels ("Clean-label attack")
   \end{itemize}
   
 \end{frame}
@@ -641,7 +631,7 @@ Taken from [!!!].
 \begin{frame}
   \frametitle{Hiding the trigger}
 
-  \taxobox{Black-box}{Evasion}{Targ./Untarg.}
+  \taxobox{White-box}{Poisoning}{Targeted}
 
   \begin{itemize}
     \item Sample instances \(s\) \(b\) of target class \(t\)
@@ -664,7 +654,7 @@ Taken from [!!!].
 \begin{frame}
   \frametitle{Narcissus}
 
-  \taxobox{Black-box}{???}{}{???}
+  \taxobox{Black-box}{Poisoning}{Targeted}
 
   \begin{itemize}
     \item Goal: get ML model to misclassify any sample with trigger pattern into target class \(t\)
@@ -679,7 +669,7 @@ Taken from [!!!].
 \begin{frame}
   \frametitle{Narcissus}
 
-  \taxobox{Black-box}{???}{}{???}
+  \taxobox{Black-box}{Poisoning}{Targeted}
 
   \begin{itemize}
     \item Assume oracle \(f_{orc}\), which is the victim's model without poisoning
@@ -693,7 +683,7 @@ Taken from [!!!].
 \begin{frame}
   \frametitle{Narcissus}
 
-  \taxobox{Black-box}{???}{}{???}
+  \taxobox{Black-box}{Poisoning}{Targeted}
 
   \begin{itemize}
     \item Train surrogate \(f_{sur}\) on \(D_{POOD}\), \(D_t\)
@@ -851,6 +841,16 @@ Taken from [!!!].
 \AtBeginSection[]{}
 \section{Backup Slides}
 
+\begin{frame}
+  \frametitle{White-box attacks to improve transferability}
+
+  \begin{itemize}
+    \item Adversarial examples can differ in transferability!
+    \item MI-FGSM: adds momentum to FGSM
+    \item Ensemble attacks
+    
+  \end{itemize}
+\end{frame}
 
 \begin{frame}
   \frametitle{ZOO: Proposed loss function}
