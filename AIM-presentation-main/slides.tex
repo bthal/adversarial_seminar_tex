@@ -512,6 +512,91 @@
 
 \arcframe{3}
 
+\begin{frame}
+  \frametitle{Transfer attacks}
+
+  \begin{itemize}
+    \item Black-box attack pattern
+    \item Adversary creates and trains a substitute model for the target
+    \item Adversarial examples for substitute model are found (white-box!)
+    \item These can be used to attack the target
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Jacobian-Based Dataset Augmentation}
+
+  \taxobox{Black-box}{Evasion}{???}{???}
+
+  \begin{itemize}
+    \item Assumption: No knowledge of model parameters, dataset 
+    \linebreak Access to somewhat representative inputs is granted (e.g. natural images) 
+    \item How do we construct a suitable substitute?
+    \item Construct an artificial dataset!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Jacobian-Based Dataset Augmentation}
+
+  \taxobox{Black-box}{Evasion}{???}{???}
+
+  \begin{itemize}
+    \item Assumption: No knowledge of model parameters, dataset 
+    \linebreak Access to somewhat representative inputs is granted (e.g. natural images) 
+    \item How do we construct a suitable substitute? (similar decision boundaries)
+    \item Construct an artificial dataset!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Jacobian-Based Dataset Augmentation}
+
+  \taxobox{Black-box}{Evasion}{???}{???}
+
+  \begin{itemize}
+    \item Use target model as an oracle to label samples 
+    \item Strategy for sample selection is necessary
+    \item Idea: iteratively add meaningful samples to dataset
+    \item Use Jacobian for a heuristic
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Heuristic for meaningful directions}
+
+  \taxobox{Black-box}{Evasion}{???}{???}
+
+  \begin{block}{}
+    \begin{align*}
+      x = x + \alpha \cdot sign(J_f(x)[o(x)])
+    \end{align*}
+  \end{block}
+
+
+  \begin{itemize}
+    \item \(J_f(x)\): total derivative
+    \item \(J_f(x)[o(x)]\): total derivative, column of the correct label
+    \item[$\leadsto$] We move into the class region (according to the substitute)!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Jacobian-Based Dataset Augmentation}
+
+  \taxobox{Black-box}{Evasion}{???}{???}
+
+  \begin{itemize}
+    \item 1) collect samples somewhat related to the input domain
+    \item 2) choose architecture for substitute
+    \item 3) target model labels current samples
+    \item 4) train substitute
+    \item 5) expand dataset: \( S_{N+1} := \{x = x + \alpha \cdot sign(J_f(x)[o(x)]) \mid x \in S_N\} \cup S_N\)
+    \item repeat (3) onwards
+  \end{itemize}
+\end{frame}
+
+
 % ==========================================================================
 % Kept as an outline entry only --- slides to be added later.
 \section{Poisoning attacks}
