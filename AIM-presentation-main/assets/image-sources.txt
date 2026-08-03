@@ -17,3 +17,5 @@ adversarial-stickers-on-stop-signs Eykholt et al. 2018 -> Robust Physical-World 
 adversarial-t-shirt Xu et al. 2020 -> Adversarial T-shirt! Evading Person Detectors in A Physical World
 adversarial-glasses Sharif et al. 2016 -> Accessorize to a Crime: Real and Stealthy Attacks on State-of-the-Art Face Recognition
 adversarial-turtle Athalye et al. 2018 -> Synthesizing Robust Adversarial Examples
+cifar-dog  genuine CIFAR-10 dog, extracted from Ilyas et al. 2019 Fig. 2 (row D) via pdfimages
+cat-cifar-style  cat from Ilyas et al. 2019 Fig. 1 (conceptual diagram, NOT a CIFAR-10 tile); downsampled to 32x32 and nearest-upscaled to match the CIFAR dog
