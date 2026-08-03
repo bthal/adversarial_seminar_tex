@@ -19,9 +19,8 @@
 \input{includes/macros/general}
 \input{includes/macros/commenting}
 
-% bibliography: local copy of the report's bib.bib (kept beside slides.tex
-% so the deck is self-contained; re-copy it if the report's bib changes)
-\addbibresource{bib.bib}
+% bibliography: reuse the report's bib file one level up
+\addbibresource{../bib.bib}
 
 % look for images in this folder's figures/ and assets/ subfolders, and in the
 % report root. Image provenance is recorded in assets/image-sources.txt.
@@ -162,7 +161,7 @@
   \ig{0.95}{panda-gibbon-reduced.png}
 
   \vfill
-  \refer{\cite{goodfellow2014explaining}}
+  \refer{Goodfellow et al., 2014}
 \end{frame}
 
 \begin{frame}[c]
@@ -202,7 +201,7 @@
   \end{columns}
 
   \vfill
-  {\tiny\refer{\cite{papernot2016transferability}}}
+  {\tiny\refer{Papernot et al., 2016}}
 \end{frame}
 
 \begin{frame}
@@ -266,7 +265,7 @@
 
 \begin{frame}
   \frametitle{L-BFGS}
-  \framesubtitle{\cite{szegedy2013intriguing}}
+  \framesubtitle{Szegedy et al., 2013}
 
   \taxobox{White-box}{Evasion}{Targeted}
 
@@ -287,7 +286,7 @@
 
 \begin{frame}
   \frametitle{L-BFGS}
-  \framesubtitle{\cite{szegedy2013intriguing}}
+  \framesubtitle{Szegedy et al., 2013}
 
   \taxobox{White-box}{Evasion}{Targeted}
 
@@ -308,7 +307,7 @@
 
 \begin{frame}
   \frametitle{Fast Gradient Sign Method}
-  \framesubtitle{\cite{goodfellow2014explaining}}
+  \framesubtitle{Goodfellow et al., 2014}
 
   \taxobox{White-box}{Evasion}{Untargeted}
   \begin{block}{}
@@ -323,7 +322,7 @@
 
 \begin{frame}
   \frametitle{Do Neural Networks behave linearly?}
-  \framesubtitle{\cite{goodfellow2014explaining}}
+  \framesubtitle{Goodfellow et al., 2014}
 
   %\taxobox{White-box}{Evasion}{Targeted}
   \begin{block}{}
@@ -333,7 +332,7 @@
 
 \begin{frame}
   \frametitle{Fast Gradient Sign Method}
-  \framesubtitle{\cite{goodfellow2014explaining}}
+  \framesubtitle{Goodfellow et al., 2014}
 
   \taxobox{White-box}{Evasion}{Untargeted}
   
@@ -352,7 +351,7 @@
 
 \begin{frame}
   \frametitle{Fast Gradient Sign Method - Example}
-  \framesubtitle{\cite{goodfellow2014explaining}}
+  \framesubtitle{Goodfellow et al., 2014}
 
   \taxobox{White-box}{Evasion}{Untargeted}
   
@@ -364,7 +363,7 @@
 
 \begin{frame}
   \frametitle{[Results/Significance]}
-  \framesubtitle{\cite{goodfellow2014explaining}}
+  \framesubtitle{Goodfellow et al., 2014}
 
   \taxobox{White-box}{Evasion}{Untargeted}
   
@@ -376,7 +375,7 @@
 
 \begin{frame}
   \frametitle{High-dimensional linearity}
-  \framesubtitle{\cite{goodfellow2014explaining}}
+  \framesubtitle{Goodfellow et al., 2014}
 
   \begin{columns}[c]
     \column{0.47\textwidth}
@@ -423,7 +422,7 @@
 
 \begin{frame}
   \frametitle{From linear models to deep networks}
-  \framesubtitle{\cite{goodfellow2014explaining}}
+  \framesubtitle{Goodfellow et al., 2014}
 
   \begin{columns}[c]
     \column{0.47\textwidth}
@@ -448,7 +447,7 @@
 
 \begin{frame}
   \frametitle{PGD}
-  \framesubtitle{\cite{madry2017towards}}
+  \framesubtitle{Madry et al., 2017}
 
   \taxobox{White-box}{Evasion}{???}
   \begin{block}{}
@@ -466,7 +465,7 @@
 
 \begin{frame}
   \frametitle{PGD - a general first-order attack?}
-  \framesubtitle{\cite{madry2017towards}}
+  \framesubtitle{Madry et al., 2017}
 
   \taxobox{White-box}{Evasion}{???}
   
@@ -478,7 +477,7 @@
 
 \begin{frame}
   \frametitle{DeepFool}
-  \framesubtitle{\cite{moosavi2016deepfool} --- the affine, binary case}
+  \framesubtitle{Moosavi-Dezfooli et al., 2016 - the affine, binary case}
 
   \taxobox{White-box}{Evasion}{Untargeted}
 
@@ -498,7 +497,7 @@
 
 \begin{frame}
   \frametitle{DeepFool}
-  \framesubtitle{\cite{moosavi2016deepfool} --- the general, multiclass case}
+  \framesubtitle{Moosavi-Dezfooli et al., 2016 - the general, multiclass case}
 
   \taxobox{White-box}{Evasion}{Untargeted}
 
@@ -538,7 +537,7 @@
 
 \begin{frame}
   \frametitle{Jacobian-Based Dataset Augmentation}
-  \framesubtitle{\cite{papernot2017practical}}
+  \framesubtitle{Papernot et al., 2017}
 
   \taxobox{Black-box}{Evasion}{???}
 
@@ -552,7 +551,7 @@
 
 \begin{frame}
   \frametitle{Jacobian-Based Dataset Augmentation}
-  \framesubtitle{\cite{papernot2017practical}}
+  \framesubtitle{Papernot et al., 2017}
 
   \taxobox{Black-box}{Evasion}{???}
 
@@ -566,7 +565,7 @@
 
 \begin{frame}
   \frametitle{Jacobian-Based Dataset Augmentation}
-  \framesubtitle{\cite{papernot2017practical}}
+  \framesubtitle{Papernot et al., 2017}
 
   \taxobox{Black-box}{Evasion}{???}
 
@@ -580,7 +579,7 @@
 
 \begin{frame}
   \frametitle{Heuristic for meaningful directions}
-  \framesubtitle{\cite{papernot2017practical}}
+  \framesubtitle{Papernot et al., 2017}
 
   \taxobox{Black-box}{Evasion}{???}
 
@@ -600,7 +599,7 @@
 
 \begin{frame}
   \frametitle{Jacobian-Based Dataset Augmentation}
-  \framesubtitle{\cite{papernot2017practical}}
+  \framesubtitle{Papernot et al., 2017}
 
   \taxobox{Black-box}{Evasion}{???}
 
@@ -738,7 +737,7 @@
 
 \begin{frame}[c]
   \frametitle{Predictive and robust features}
-  \framesubtitle{\cite{ilyas2019adversarial}}
+  \framesubtitle{Ilyas et al., 2019}
 
   \begin{columns}[t]
     \column{0.47\textwidth}
@@ -762,7 +761,7 @@
 
 \begin{frame}[c]
   \frametitle{Experiment: "Mislabeled" training dataset}
-  \framesubtitle{\cite{ilyas2019adversarial}}
+  \framesubtitle{Ilyas et al., 2019}
 
   \vfill
   \centering
@@ -871,7 +870,7 @@
 
 \begin{frame}[c]
   \frametitle{Why that works}
-  \framesubtitle{\cite{ilyas2019adversarial}}
+  \framesubtitle{Ilyas et al., 2019}
 
   \renewcommand{\arraystretch}{1.05}
   \centering
@@ -928,7 +927,7 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
 
 \begin{frame}
   \frametitle{Carlini \& Wagner}
-  \framesubtitle{\cite{carlini2017towards}}
+  \framesubtitle{Carlini \& Wagner, 2017}
 
   \taxobox{White-box}{Evasion}{Targeted}
 
@@ -949,7 +948,7 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
 
 \begin{frame}
   \frametitle{Carlini \& Wagner}
-  \framesubtitle{\cite{carlini2017towards}}
+  \framesubtitle{Carlini \& Wagner, 2017}
 
   \taxobox{White-box}{Evasion}{Targeted}
 
@@ -982,15 +981,15 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
     \centering
     \includegraphics[height=3.7cm]{adversarial-glasses.png}\hfill
     \includegraphics[height=3.7cm]{adversarial-t-shirt.png}\\[3pt]
-    {\tiny\refer{\cite{sharif2016accessorize} \quad$\cdot$\quad \cite{xu2020adversarial}}}
+    {\tiny\refer{Sharif et al., 2016 \quad$\cdot$\quad Xu et al., 2020}}
 
     % two wide-format images stacked
     \column{0.62\textwidth}
     \centering
     \includegraphics[width=0.96\linewidth]{adversarial-stickers-on-stop-signs.png}\\[2pt]
-    {\tiny\refer{\cite{eykholt2018robust}}}\\[7pt]
+    {\tiny\refer{Eykholt et al., 2018}}\\[7pt]
     \includegraphics[width=0.96\linewidth]{adversarial-turtle.png}\\[2pt]
-    {\tiny\refer{\cite{athalye2018synthesizing}}}
+    {\tiny\refer{Athalye et al., 2018}}
   \end{columns}
 \end{frame}
 
