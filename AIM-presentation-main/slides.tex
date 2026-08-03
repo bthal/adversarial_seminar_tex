@@ -61,6 +61,11 @@
 % taking #1 cannot be used inside a tabular column specification.
 \newcolumntype{R}[1]{>{\raggedright\arraybackslash}p{#1}}
 
+% Fixed-width column that is centred BOTH ways. `m' (not `p') is what vertically
+% centres the cell against a multi-line row; a plain `c' column would sit the
+% image on the first line's baseline instead.
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+
 % Significance box --- used on the closing slide of every attack to state, in
 % 1--3 bullets, what the technique is remembered for and why it matters.
 \newenvironment{significance}
@@ -224,24 +229,16 @@
 % ==========================================================================
 
 \begin{frame}
-  \frametitle{Definition}
+  \frametitle{What is an Adversarial Example?}
 
   \begin{block}{Definition (Adversarial Example)}
-    An \emph{adversarial example} is an \textbf{input to a machine learning model}
-    that has been \textbf{intentionally perturbed}, typically \textbf{in a subtle
-    and often imperceptible manner}, such that the model produces an incorrect
-    prediction while the semantic content of the input remains unchanged.
+    An \emph{adversarial example} is an \textbf{input to a machine learning model} that has been intentionally perturbed, typically \textbf{in a subtle and often imperceptible manner}, such that the model \textbf{produces an incorrect prediction} while the semantic content of the input remains unchanged.
   \end{block}
 
-  \pause
   \begin{itemize}
-    \item \textbf{Machine learning models} --- no quirk of deep networks, but a general
-          property of machine learners.
-    \item \textbf{Intentional perturbations} --- generated systematically through
-          optimisation and exploited by an adversary, not stumbled upon.
-    \item \textbf{Subtle and imperceptible perturbations} --- mathematically small under
-          a chosen norm, and visually indistinguishable to humans; the latter is
-          asserted far more often than it is rigorously validated.
+    \item<2-> \textbf{Machine learning models}: No quirk of deep networks, but a general property of machine learners
+    \item<3-> \textbf{Subtle and imperceptible perturbations}: mathematically small under a chosen norm / visually imperceptible to humans
+    \item<4-> \textbf{Produces an incorrect predition}: The machine learner is fooled where the human would not have been
   \end{itemize}
 \end{frame}
 
@@ -253,10 +250,10 @@
   \frametitle{Four orthogonal axes}
 
   \begin{itemize}
-    \item \textbf{Attacker knowledge}: white-box vs.\ black-box
-    \item \textbf{Attack stage}: evasion (test time) vs.\ poisoning (train time)
-    \item \textbf{Attack goal}: targeted vs.\ untargeted
-    \item \textbf{Perturbation constraint}: which norm, which budget
+    \item \textbf{Attacker knowledge}: White-box vs.\ Black-box
+    \item \textbf{Attack stage}: Evasion (at testing time) vs.\ Poisoning (at training time)
+    \item \textbf{Attack goal}: Targeted (specific target label) vs.\ Untargeted (just any wrong label)
+    \item \textbf{Perturbation constraint}: which Norm, which Budget
   \end{itemize}
 
 \end{frame}
@@ -269,8 +266,7 @@
 \includegraphics[width=0.95\textwidth, height=0.62\textheight, keepaspectratio]{norms.png}
 
 \vskip12pt
-The norm defines the \textbf{perturbation budget} $\epsilon$ and, with it,
-what ``similar'' even means.
+Norm defines the \textbf{perturbation budget $\epsilon$}.
 \vfill
 \end{frame}
 
@@ -280,6 +276,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{L-BFGS}
+  \framesubtitle{Szegedy et al., 2013}
 
   \taxobox{White-box}{Evasion}{Targeted}{$\ell_2$}
 
@@ -300,6 +297,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{L-BFGS}
+  \framesubtitle{Szegedy et al., 2013}
 
   \taxobox{White-box}{Evasion}{Targeted}{$\ell_2$}
 
@@ -320,6 +318,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{Fast Gradient Sign Method}
+  \framesubtitle{Goodfellow et al., 2014}
 
   \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
   \begin{block}{}
@@ -334,6 +333,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{Do Neural Networks behave linearly?}
+  \framesubtitle{Goodfellow et al., 2014}
 
   %\taxobox{White-box}{Evasion}{Targeted}{$\ell_\infty$}
   \begin{block}{}
@@ -343,6 +343,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{Fast Gradient Sign Method}
+  \framesubtitle{Goodfellow et al., 2014}
 
   \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
   
@@ -361,6 +362,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{Fast Gradient Sign Method - Example}
+  \framesubtitle{Goodfellow et al., 2014}
 
   \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
   
@@ -372,6 +374,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{[Results/Significance]}
+  \framesubtitle{Goodfellow et al., 2014}
 
   \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
   
@@ -383,6 +386,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{PGD}
+  \framesubtitle{Madry et al., 2017}
 
   \taxobox{White-box}{Evasion}{???}{???}
   \begin{block}{}
@@ -400,6 +404,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{PGD - a general first-order attack?}
+  \framesubtitle{Madry et al., 2017}
 
   \taxobox{White-box}{Evasion}{???}{???}
   
@@ -409,7 +414,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{DeepFool}
-  \framesubtitle{The affine, binary case}
+  \framesubtitle{Moosavi-Dezfooli et al., 2016 --- the affine, binary case}
 
   \taxobox{White-box}{Evasion}{Untargeted}{$\ell_2$}
 
@@ -417,19 +422,10 @@ what ``similar'' even means.
     \column{0.55\textwidth}
     \begin{itemize}
       \item For an affine $f(x) = w^\top x + b$, the decision boundary
-            $\mathcal{F}$ is a \textbf{hyperplane}.
-      \item Minimal perturbation is the \textbf{orthogonal projection} of $x_0$
-            onto $\mathcal{F}$ --- closed form, no search.
+            $\mathcal{F}$ is a \emph{hyperplane}
+      \item Minimal perturbation is \emph{orthogonal projection} of $x$
+            onto $\mathcal{F}$ $\rightarrow$ closed form
     \end{itemize}
-
-    \vskip-2pt
-    \begin{block}{}
-      \vskip-6pt
-      \begin{align*}
-        r_*(x_0) = -\,\frac{f(x_0)}{\|w\|_2^{2}}\, w
-      \end{align*}
-      \vskip-6pt
-    \end{block}
 
     \column{0.43\textwidth}
     \centering
@@ -439,7 +435,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{DeepFool}
-  \framesubtitle{The general, multiclass case}
+  \framesubtitle{Moosavi-Dezfooli et al., 2016 --- the general, multiclass case}
 
   \taxobox{White-box}{Evasion}{Untargeted}{$\ell_2$}
 
@@ -470,6 +466,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{Carlini \& Wagner}
+  \framesubtitle{Carlini \& Wagner, 2017}
 
   \taxobox{White-box}{Evasion}{Targeted}{$\ell_0 / \ell_2 / \ell_\infty$}
 
@@ -490,6 +487,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{Carlini \& Wagner}
+  \framesubtitle{Carlini \& Wagner, 2017}
 
   \taxobox{White-box}{Evasion}{Targeted}{$\ell_0 / \ell_2 / \ell_\infty$}
 
@@ -527,6 +525,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{Jacobian-Based Dataset Augmentation}
+  \framesubtitle{Papernot et al., 2017}
 
   \taxobox{Black-box}{Evasion}{???}{???}
 
@@ -540,6 +539,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{Jacobian-Based Dataset Augmentation}
+  \framesubtitle{Papernot et al., 2017}
 
   \taxobox{Black-box}{Evasion}{???}{???}
 
@@ -553,6 +553,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{Jacobian-Based Dataset Augmentation}
+  \framesubtitle{Papernot et al., 2017}
 
   \taxobox{Black-box}{Evasion}{???}{???}
 
@@ -566,6 +567,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{Heuristic for meaningful directions}
+  \framesubtitle{Papernot et al., 2017}
 
   \taxobox{Black-box}{Evasion}{???}{???}
 
@@ -585,6 +587,7 @@ what ``similar'' even means.
 
 \begin{frame}
   \frametitle{Jacobian-Based Dataset Augmentation}
+  \framesubtitle{Papernot et al., 2017}
 
   \taxobox{Black-box}{Evasion}{???}{???}
 
@@ -644,23 +647,20 @@ what ``similar'' even means.
   \end{columns}
 \end{frame}
 
-\subsection{Real-life adversarial attacks}
-
 \begin{frame}[c]
   \frametitle{Real-life adversarial attacks}
 
   \begin{itemize}
-    \item Confirmed malicious attacks on real institutions or individuals --- strikingly rare
-    \item Two candidate explanations:
+    \item<1-> Real confirmed malicious attacks are surprisingly rare
+    \item<2-> Two candidate explanations:
     \begin{enumerate}
-      \item they slip through unnoticed, logged as ordinary misclassifications
-      \item they are simply of little use to actual attackers
+      \item<2-> They slip through unnoticed, logged as ordinary misclassifications
+      \item<2-> They are simply of little use to actual attackers
     \end{enumerate}
-    \item Case for the second:
+    \item<3-> Case for the second:
     \begin{itemize}
-      \item crafting them reliably needs ML \emph{and} security expertise
-      \item DDoS, character obfuscation, packing a binary --- cheap, fast, effective
-      \item[$\leadsto$] picking a lock where a crowbar is cheaper and works just as well
+      \item<3-> Needs ML \emph{and} security expertise
+      \item<3-> DDoS, character obfuscation, packing a binary etc. $\rightarrow$ cheap, fast, effective
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -677,11 +677,11 @@ what ``similar'' even means.
 
   \begin{columns}[c]
     \column{0.47\textwidth}
-    \begin{itemize}
+    \begin{itemize}[<+->]
       \item Affine case first: perturbation shifts activation by $w^\top\eta$
-      \item Worst case: $\eta$ aligned with the weights
-      \item Output change --- \textbf{linear} in $n$ (number of dimensions)
-      \item[$\leadsto$] Many imperceptible, weight-aligned changes accumulate into
+      \item Best strategy: $\eta$ aligned with the weights
+      \item Score change scales \emph{linearly} with number of dimensions w.r.t. input change
+      \item[$\leadsto$] Many imperceptible changes accumulate into
             one large shift
     \end{itemize}
 
@@ -724,9 +724,9 @@ what ``similar'' even means.
 
   \begin{columns}[c]
     \column{0.47\textwidth}
-    \begin{itemize}
-      \item Modern architectures deliberately behave \emph{locally linearly} (easier to optimise)
-      \item[$\leadsto$] The linear analysis carries over within $\epsilon$-ball
+    \begin{itemize}[<+->]
+      \item Most DNN architectures behave \emph{locally linearly} for ease of optimisation
+      \item[$\leadsto$] Within $\epsilon$-ball, the linear argument carries over 
     \end{itemize}
 
     \column{0.50\textwidth}
@@ -742,7 +742,7 @@ what ``similar'' even means.
 \end{frame}
 
 \begin{frame}[c]
-  \frametitle{Predictive vs.\ robust features}
+  \frametitle{Predictive and robust features}
   \framesubtitle{Ilyas et al., 2019}
 
   \begin{columns}[t]
@@ -754,13 +754,13 @@ what ``similar'' even means.
 
     \column{0.47\textwidth}
     \centering
-    \textbf{Robust}\\[3pt]
+    \uncover<2->{\textbf{Robust}}\\[3pt]
     \parbox[t][2.6em]{\linewidth}{\centering\small
-      Stays correlated \emph{under} adversarial perturbation.}\\[6pt]
+      \uncover<2->{Stays correlated \emph{under} adversarial perturbation.}}\\[6pt]
   \end{columns}
 
   \vfill
-  \begin{itemize}
+  \begin{itemize}[<3->]
     \item[$\leadsto$] \textbf{Predictive but non-robust:} Standard training happily relies on such features.
   \end{itemize}
 \end{frame}
@@ -779,24 +779,27 @@ what ``similar'' even means.
   \frametitle{Why that works}
   \framesubtitle{Ilyas et al., 2019}
 
-  \renewcommand{\arraystretch}{1.35}
+  \renewcommand{\arraystretch}{1.05}
   \centering
   \begin{footnotesize}
-  \begin{tabular}{@{}R{0.235\textwidth} R{0.185\textwidth} R{0.235\textwidth} R{0.20\textwidth}@{}}
+  \begin{tabular}{@{}R{0.205\textwidth} R{0.155\textwidth} R{0.205\textwidth} R{0.165\textwidth} M{0.085\textwidth}@{}}
     \toprule
      & \textbf{Robust features point at} & \textbf{Non-robust features point at}
-     & \textbf{Label} \\
+     & \textbf{Label} & \textbf{Image} \\
     \midrule
     \textbf{Original clean training image} (in $\mathcal{D}$)
-      & dog & dog & dog \\
+      & dog & dog & dog
+      & \includegraphics[height=0.80cm]{cifar-dog.png} \\
     \midrule
     \textbf{Perturbed training image} (in $\widehat{\mathcal{D}}_{NR}$)
-      & dog \newline \emph{\scriptsize (unaffected by tiny perturbation)}
+      & dog \newline \emph{\scriptsize (unaffected by perturbation)}
       & cat \newline \emph{\scriptsize (through adversarial perturbation)}
-      & cat \\
+      & cat
+      & \includegraphics[height=0.80cm]{cifar-dog.png} \\
     \midrule
-    \textbf{Original clean test image}
-      & cat & cat & \textbf{cat} (predicted) \\
+    \textbf{Original clean test image}  (in $\mathcal{D}$)
+      & cat & cat & \textbf{cat} (predicted)
+      & \includegraphics[height=0.80cm]{cat-cifar-style.png} \\
     \bottomrule
   \end{tabular}
   \end{footnotesize}
@@ -807,26 +810,42 @@ what ``similar'' even means.
 \begin{frame}[c]
   \frametitle{Adversarial attacks as a subject of study}
 
+  % Explicit overlay specs, not [<+->]: with [<+->] the nested sub-bullets each
+  % consume their own step, which yields 11 overlays instead of 4. Sub-bullets
+  % share their parent's spec so they appear together with it.
   \begin{itemize}
-    \item Not really significant security threat
-    \item Mainly \emph{epistemic significance}: not about what attacker can do but more
-          about what they reveal about the systems they target
-    \item Before them: accuracy was almost only metric, robustness assumed implicitly
-    \item After them:
+    \item<1-> Not really significant security threat
+    \item<2-> Mainly \emph{epistemic significance}:
     \begin{itemize}
-      \item high test accuracy $\neq$ grasping the task as a human would
-      \item a more intricate account of how learners operate
-      \item robustness as a distinct property of interest
+      \item<2-> Not: What can an attacker do?
+      \item<2-> But: What do they reveal about the targetted system?
+    \end{itemize}
+    \item<3-> Before
+    \begin{itemize}
+      \item<3-> Accuracy as near-single metric
+      \item<3-> Robustness assumed implicitly
+    \end{itemize}
+    \item<4-> Afterwards:
+    \begin{itemize}
+      \item<4-> High accuracy $\neq$ understanding the task as a human would
+      \item<4-> A more intricate account of how learners operate
+      \item<4-> Robustness as a distinct property of interest
     \end{itemize}
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{FINAL SLIDE?}
+% Closing slide --- deliberately has no \frametitle.
+\begin{frame}[c]
+  \begin{columns}[c]
+    \column{0.54\textwidth}
+    \centering
+    {\Large\bfseries\textcolor{rwth-blue-100}{Thank you for your attention!}}\\[14pt]
+    {\Large\textcolor{rwth-blue-100}{Questions?}}
 
-  \begin{itemize}
-    \item[] % to be filled in
-  \end{itemize}
+    \column{0.42\textwidth}
+    \centering
+    \includegraphics[width=0.80\linewidth, height=0.62\textheight, keepaspectratio]{panda-giving-thumbs-up.jpg}
+  \end{columns}
 \end{frame}
 
 \appendix
