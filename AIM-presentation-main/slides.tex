@@ -659,6 +659,43 @@ what ``similar'' even means.
 % ==========================================================================
 % Kept as an outline entry only --- slides to be added later.
 \section{Poisoning attacks}
+
+\begin{frame}
+  \frametitle{Poison Frogs}
+
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
+
+  \begin{itemize}
+    \item Goal: get ML model to misclassify one specific sample \(v\) into target class \(t\)
+    \item Assumption: model based on pretrained weights known to the attacker, access to data distribution
+    \item Restriction: adversary cannot choose labels
+    \item -> "clean-label attack"
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Poison Frogs: poison instances}
+
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
+
+  \begin{itemize}
+    \item Sample instance \(b\) of target class \(t\)
+    \item Poison instance(s):
+  \end{itemize}
+  \begin{block}{}
+    \begin{align*}
+      p = \arg\min_x {\lvert \lvert g(x) - g(v) \rvert \rvert_{2}^2 + \lambda \lvert \lvert x - b \rvert \rvert_{2}^2} 
+    \end{align*}
+  \end{block}
+
+  \begin{itemize}
+    \item \(g\): feature representation (second-to-last layer output)
+    \item keep \(x\) close to \(v\) in feature space, but close to \(b\) in pixel space
+  \end{itemize}
+  
+\end{frame}
+
 % ==========================================================================
 
 % ==========================================================================
