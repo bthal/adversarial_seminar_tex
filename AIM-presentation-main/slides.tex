@@ -30,6 +30,8 @@
   {assets/critical-ai-use/}
   {assets/transferability/}
   {assets/deepfool/}
+  {assets/ilyas/}
+  {assets/physical-attacks/}
   {../}
 }
 
@@ -53,6 +55,11 @@
       {#1 \;$\cdot$\; #2 \;$\cdot$\; #3 \;$\cdot$\; #4};
   \end{tikzpicture}%
 }
+
+% Ragged-right fixed-width table column (no stretched interword space, no
+% hyphen breaks). \newcolumntype is the correct mechanism here -- a \newcommand
+% taking #1 cannot be used inside a tabular column specification.
+\newcolumntype{R}[1]{>{\raggedright\arraybackslash}p{#1}}
 
 % Significance box --- used on the closing slide of every attack to state, in
 % 1--3 bullets, what the technique is remembered for and why it matters.
@@ -116,7 +123,7 @@
 % ==========================================================================
 
 \begin{frame}
-  \frametitle{Two images}
+  \frametitle{Which one is the gibbon?}
 
   \vfill
   \begin{columns}[c]
@@ -132,7 +139,7 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Two images}
+  \frametitle{Which one is the gibbon?}
 
   \vfill
   \begin{columns}[c]
@@ -164,15 +171,11 @@
   \begin{columns}[c]
     \column{0.54\textwidth}
     \begin{itemize}[<+->]
-      \item An adversarial example crafted against \emph{one} model often fools
-            models it was never shown.
-      \item This survives a change of \textbf{architecture} --- and of
-            \textbf{training data}, initialisation, and hyperparameters.
-      \item This points to something deeper: the vulnerability appears to be
-            \textbf{inherent to the problem being learned}, not a defect of a particular
-            model, or even of a particular architecture.
-      \item[$\leadsto$] The attacker needs \textbf{no access} to the target.
-            Train your own model, attack that, and the perturbation carries over.
+      \item An adversarial example crafted against one model often fools other models as well
+      \item Survives a change of architecture as well as of training data,
+            initialisation, hyperparameters
+      \item Vulnerability apparently \emph{inherent to
+            problem itself}, not to one model or one architecture
     \end{itemize}
 
     \column{0.42\textwidth}
@@ -184,7 +187,7 @@
   \end{columns}
 
   \vfill
-  \refer{Papernot et al., 2016}
+  {\tiny\refer{Papernot et al., 2016}}
 \end{frame}
 
 \begin{frame}
@@ -193,12 +196,11 @@
   \begin{columns}[c]
     \column{0.52\textwidth}
     \begin{itemize}[<+->]
-      \item What we just saw exposes a \textbf{fundamental blind spot} --- the model
-            and the human are not looking at the same thing.
-      \item That raises hard questions about the \textbf{reliability} of systems we
-            already treat as dependable.
-      \item And it grows more pressing as these systems are woven ever deeper into
-            \textbf{everyday life}, where failures carry real consequences.
+      \item \textbf{Fundamental blind spot}: model
+            and human do not share one understanding of input
+      \item Raises questions about \textbf{reliability} of systems
+      \item More pressing as systems are entering deeper and deeper into
+            \textbf{everyday life} and critical infrastructure
     \end{itemize}
 
     \column{0.44\textwidth}
@@ -224,7 +226,7 @@
 \begin{frame}
   \frametitle{Definition}
 
-  \begin{block}{Definition 1 (Adversarial Example)}
+  \begin{block}{Definition (Adversarial Example)}
     An \emph{adversarial example} is an \textbf{input to a machine learning model}
     that has been \textbf{intentionally perturbed}, typically \textbf{in a subtle
     and often imperceptible manner}, such that the model produces an incorrect
@@ -243,19 +245,6 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Measuring ``small'': the $\ell_p$ norms}
-
-  \vfill
-  \centering
-  \includegraphics[width=0.95\textwidth, height=0.62\textheight, keepaspectratio]{norms.png}
-
-  \vskip12pt
-  The norm defines the \textbf{perturbation budget} $\epsilon$ and, with it,
-  what ``similar'' even means.
-  \vfill
-\end{frame}
-
 % ==========================================================================
 \section{Taxonomy}
 % ==========================================================================
@@ -264,12 +253,25 @@
   \frametitle{Four orthogonal axes}
 
   \begin{itemize}
-    \item \textbf{Attacker knowledge} --- white-box vs.\ black-box
-    \item \textbf{Attack stage} --- evasion (test time) vs.\ poisoning (train time)
-    \item \textbf{Attack goal} --- targeted vs.\ untargeted
-    \item \textbf{Perturbation constraint} --- which norm, which budget
+    \item \textbf{Attacker knowledge}: white-box vs.\ black-box
+    \item \textbf{Attack stage}: evasion (test time) vs.\ poisoning (train time)
+    \item \textbf{Attack goal}: targeted vs.\ untargeted
+    \item \textbf{Perturbation constraint}: which norm, which budget
   \end{itemize}
 
+\end{frame}
+
+\begin{frame}
+\frametitle{Measuring ``small'': the $\ell_p$ norms}
+
+\vfill
+\centering
+\includegraphics[width=0.95\textwidth, height=0.62\textheight, keepaspectratio]{norms.png}
+
+\vskip12pt
+The norm defines the \textbf{perturbation budget} $\epsilon$ and, with it,
+what ``similar'' even means.
+\vfill
 \end{frame}
 
 % ==========================================================================
@@ -355,7 +357,7 @@
   \begin{columns}[c]
     \column{0.55\textwidth}
     \begin{itemize}
-      \item \textbf{Non-linear:} iterative -> linearise the
+      \item \textbf{Non-linear:} iterative $\rightarrow$ linearise the
             score function at current point (first-order Taylor), project onto that
             hyperplane, repeat until label flips.
       \item \textbf{Multiclass:}
@@ -392,7 +394,7 @@
 
   \begin{itemize}
     \item $\;\ell(x') = \max\!\big(\max_{i\neq t} z_i(x') - z_t(x'),\; 0\big)$.
-    \item Built so that $\ell(x') \le 0 \iff$ input is classified as $t$ -> faithfully encodes the attack goal.
+    \item Built so that $\ell(x') \le 0 \iff$ input is classified as $t$ $\rightarrow$ faithfully encodes the attack goal.
     \item $c$ decided through \textbf{binary search}
   \end{itemize}
 \end{frame}
@@ -410,8 +412,8 @@
   \end{block}
 
   \begin{itemize}
-    \item mapping any $w \in \mathbb{R}^m$ into $(0,1)^m$ -> every $w$
-          decodes to a \textbf{valid image} -> dissolving box-constraint
+    \item mapping any $w \in \mathbb{R}^m$ into $(0,1)^m$ $\rightarrow$ every $w$
+          decodes to a \textbf{valid image} $\rightarrow$ dissolving box-constraint
     \item Optimise $w$ \textbf{unconstrained} with Adam optimiser
   \end{itemize}
 
@@ -434,14 +436,47 @@
 
 \subsection{Physical adversarial attacks}
 
-\begin{frame}
+\begin{frame}[c]
   \frametitle{Physical adversarial attacks}
+
+  \vfill
+  \begin{columns}[c]
+    % two portrait-format images side by side
+    \column{0.34\textwidth}
+    \centering
+    \includegraphics[height=3.7cm]{adversarial-glasses.png}\hfill
+    \includegraphics[height=3.7cm]{adversarial-t-shirt.png}\\[3pt]
+    {\tiny\refer{Sharif et al., 2016 \quad$\cdot$\quad Xu et al., 2020}}
+
+    % two wide-format images stacked
+    \column{0.62\textwidth}
+    \centering
+    \includegraphics[width=0.96\linewidth]{adversarial-stickers-on-stop-signs.png}\\[2pt]
+    {\tiny\refer{Eykholt et al., 2018}}\\[7pt]
+    \includegraphics[width=0.96\linewidth]{adversarial-turtle.png}\\[2pt]
+    {\tiny\refer{Athalye et al., 2018}}
+  \end{columns}
 \end{frame}
 
 \subsection{Real-life adversarial attacks}
 
-\begin{frame}
+\begin{frame}[c]
   \frametitle{Real-life adversarial attacks}
+
+  \begin{itemize}
+    \item Confirmed malicious attacks on real institutions or individuals --- strikingly rare
+    \item Two candidate explanations:
+    \begin{enumerate}
+      \item they slip through unnoticed, logged as ordinary misclassifications
+      \item they are simply of little use to actual attackers
+    \end{enumerate}
+    \item Case for the second:
+    \begin{itemize}
+      \item crafting them reliably needs ML \emph{and} security expertise
+      \item DDoS, character obfuscation, packing a binary --- cheap, fast, effective
+      \item[$\leadsto$] picking a lock where a crowbar is cheaper and works just as well
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \subsection{Explaining adversarial examples}
@@ -450,14 +485,158 @@
   \frametitle{Explaining adversarial examples}
 \end{frame}
 
-\subsection{Adversarial attacks as a subject of study}
-
 \begin{frame}
-  \frametitle{Adversarial attacks as a subject of study}
+  \frametitle{High-dimensional linearity}
+  \framesubtitle{Goodfellow et al., 2014}
+
+  \begin{columns}[c]
+    \column{0.47\textwidth}
+    \begin{itemize}
+      \item Affine case first: perturbation shifts activation by $w^\top\eta$
+      \item Worst case: $\eta$ aligned with the weights
+      \item Output change --- \textbf{linear} in $n$ (number of dimensions)
+      \item[$\leadsto$] Many imperceptible, weight-aligned changes accumulate into
+            one large shift
+    \end{itemize}
+
+    \column{0.50\textwidth}
+    \centering
+    \begin{tikzpicture}[>=stealth, x=0.72cm, y=0.72cm]
+      % decision boundary
+      \draw[rwth-blue-100, thick] (-0.15,0.225) -- (4.15,2.375);
+      \node[rwth-blue-100, font=\tiny, above left] at (4.15,2.30) {$w^\top x + b = 0$};
+      % w is the normal of the boundary -- shown for reference
+      \draw[->, rwth-black-50] (0.60,0.60) -- (0.198,1.405);
+      \node[rwth-black-50, font=\tiny, left] at (0.21,1.42) {$w$};
+      % x sits on the positive side; stepping along -w crosses by the shortest route
+      \draw[->, rwth-red-100, thick] (1.77,2.00) -- (2.40,0.75);
+      \node[rwth-red-100, font=\tiny, right] at (2.18,1.46) {$\eta = -\epsilon \operatorname{sign}(w)$};
+      \fill[rwth-black-100] (1.77,2.00) circle (1.7pt);
+      \node[rwth-black-100, font=\tiny, above left] at (1.82,2.06) {$x$};
+      \fill[rwth-red-100] (2.40,0.75) circle (1.7pt);
+      \node[rwth-red-100, font=\tiny, below] at (2.45,0.68) {$\tilde{x}$};
+    \end{tikzpicture}
+
+    \vskip2pt
+    \begin{block}{}
+      \vskip-10pt
+      \begin{align*}
+        w^\top \tilde{x} &= w^\top (x + \eta) \\
+                         &= w^\top x + w^\top \eta \\[3pt]
+        w^\top \eta &= \epsilon \sum_{i=1}^{n} |w_i| = \epsilon \, m \, n
+      \end{align*}
+      \vskip-10pt
+    \end{block}
+
+    {\tiny\refer{$n$ dimensions, mean weight magnitude $m$}}
+  \end{columns}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Take-home messages}
+  \frametitle{From linear models to deep networks}
+  \framesubtitle{Goodfellow et al., 2014}
+
+  \begin{columns}[c]
+    \column{0.47\textwidth}
+    \begin{itemize}
+      \item Modern architectures deliberately behave \emph{locally linearly} (easier to optimise)
+      \item[$\leadsto$] The linear analysis carries over within $\epsilon$-ball
+    \end{itemize}
+
+    \column{0.50\textwidth}
+    \centering
+    \begin{tikzpicture}[every node/.style={inner sep=1.5pt}]
+      \node[rwth-blue-100,   font=\Large\bfseries] at (0.10, 1.55) {ReLU};
+      \node[rwth-petrol-100, font=\large]          at (2.55, 1.70) {LSTM};
+      \node[rwth-maroon-75,  font=\normalsize]     at (4.05, 0.95) {maxout};
+      \node[rwth-violet-75,  font=\small]          at (0.55, 0.75) {sigmoid near zero};
+      \node[rwth-green-75,   font=\normalsize]     at (3.15, 0.15) {linear-softmax};
+    \end{tikzpicture}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[c]
+  \frametitle{Predictive vs.\ robust features}
+  \framesubtitle{Ilyas et al., 2019}
+
+  \begin{columns}[t]
+    \column{0.47\textwidth}
+    \centering
+    \textbf{Predictive}\\[3pt]
+    \parbox[t][2.6em]{\linewidth}{\centering\small
+      Correlated with the label in expectation.}\\[6pt]
+
+    \column{0.47\textwidth}
+    \centering
+    \textbf{Robust}\\[3pt]
+    \parbox[t][2.6em]{\linewidth}{\centering\small
+      Stays correlated \emph{under} adversarial perturbation.}\\[6pt]
+  \end{columns}
+
+  \vfill
+  \begin{itemize}
+    \item[$\leadsto$] \textbf{Predictive but non-robust:} Standard training happily relies on such features.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[c]
+  \frametitle{Non-robust features are real signal}
+  \framesubtitle{Ilyas et al., 2019}
+
+  \vfill
+  \centering
+  \includegraphics[width=0.82\textwidth, height=0.58\textheight, keepaspectratio]{dataset-robust-removed.png}
+  \vfill
+\end{frame}
+
+\begin{frame}[c]
+  \frametitle{Why that works}
+  \framesubtitle{Ilyas et al., 2019}
+
+  \renewcommand{\arraystretch}{1.35}
+  \centering
+  \begin{footnotesize}
+  \begin{tabular}{@{}R{0.235\textwidth} R{0.185\textwidth} R{0.235\textwidth} R{0.20\textwidth}@{}}
+    \toprule
+     & \textbf{Robust features point at} & \textbf{Non-robust features point at}
+     & \textbf{Label} \\
+    \midrule
+    \textbf{Original clean training image} (in $\mathcal{D}$)
+      & dog & dog & dog \\
+    \midrule
+    \textbf{Perturbed training image} (in $\widehat{\mathcal{D}}_{NR}$)
+      & dog \newline \emph{\scriptsize (unaffected by tiny perturbation)}
+      & cat \newline \emph{\scriptsize (through adversarial perturbation)}
+      & cat \\
+    \midrule
+    \textbf{Original clean test image}
+      & cat & cat & \textbf{cat} (predicted) \\
+    \bottomrule
+  \end{tabular}
+  \end{footnotesize}
+\end{frame}
+
+\subsection{Adversarial attacks as a subject of study}
+
+\begin{frame}[c]
+  \frametitle{Adversarial attacks as a subject of study}
+
+  \begin{itemize}
+    \item Not really significant security threat
+    \item Mainly \emph{epistemic significance}: not about what attacker can do but more
+          about what they reveal about the systems they target
+    \item Before them: accuracy was almost only metric, robustness assumed implicitly
+    \item After them:
+    \begin{itemize}
+      \item high test accuracy $\neq$ grasping the task as a human would
+      \item a more intricate account of how learners operate
+      \item robustness as a distinct property of interest
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{FINAL SLIDE?}
 
   \begin{itemize}
     \item[] % to be filled in
@@ -474,14 +653,5 @@
   \frametitle{References}
   \printbibliography[heading=none]
 \end{frame}
-
-% ==========================================================================
-% BACKUP
-% ==========================================================================
-
-\begin{frame}
-  \frametitle{Backup: attack comparison}
-
-  \end{frame}
 
 \end{document}
