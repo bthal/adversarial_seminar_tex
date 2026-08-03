@@ -609,7 +609,52 @@ what ``similar'' even means.
   \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{ZOO: Zeroth order black-box attacks}
 
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
+
+  \begin{itemize}
+    \item Black-box attack without substitute model
+    \item No quality loss due to transfer
+    \item Assumptions: Adversary allowed to query, gets confidence scores
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Coordinate-wise pseudo gradient}
+
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
+  \begin{block}{}
+    \begin{align*}
+      \hat{g_i}
+      := \frac{\partial l(x)}{\partial x_i}
+      \approx \frac{l(x + he_i) - l(x - he_i)}{2h}
+    \end{align*}
+  \end{block}
+
+  \begin{itemize}
+    \item \(l\) loss function based on confidence scores
+    \item Two queries per coordinate, full gradient infeasible
+    \item -> Coordinate descent using first and/or second-order method
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Proposed loss function}
+
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
+
+  \begin{itemize}
+    \item Reminder: Carlini-Wagner loss:
+      \(\;\ell(x') = \max\!\big(\max_{i\neq t} z_i(x') - z_t(x'),\; 0\big)\) 
+    \item Targeted ZOO: \(l(x,t) = \max\{ \max_{i\neq t} \{\log[f(x)]_i\} - \log[f(x)]_t,-\kappa \}\)
+    \item Untargeted ZOO: \(l(x) = \max\{ \log[f(x)]_{y} - \max_{i\neq y} \{\log[f(x)]_i\} ,-\kappa \}\)
+  \end{itemize}
+  \begin{itemize}
+    \item \(log\) to estimate logits
+  \end{itemize}
+\end{frame}
 
 % ==========================================================================
 % Kept as an outline entry only --- slides to be added later.
