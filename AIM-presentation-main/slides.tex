@@ -405,7 +405,7 @@
 
   \taxobox{White-box}{Evasion}{Untargeted}
   \begin{block}{}
-    General formulation of adversarial training [...! incl. defenders part?]. Adversary solves
+    General formulation of adversarial training. Adversary solves
     \[
     \max_{\delta\in S}L_f(x+\delta, y)
     \]
@@ -413,7 +413,6 @@
   \begin{itemize}
     \item FGSM: Use \(S=\{\delta \mid \lVert \delta \rVert_\infty \leq \epsilon\}\)
     \item Use projected gradient descent to optimise
-    \item[$\leadsto$] Models may be too linear
   \end{itemize}
 \end{frame}
 
@@ -565,7 +564,7 @@
 
 \begin{frame}
   \frametitle{ZOO: Zeroth order black-box attacks}
-
+  \framesubtitle{\cite{chen2017zoo}}
   \taxobox{Black-box}{Evasion}{Targ./Untarg.}
 
   \begin{itemize}
@@ -576,8 +575,8 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Coordinate-wise pseudo gradient}
-
+  \frametitle{ZOO: Coordinate-wise pseudo gradient}
+  \framesubtitle{\cite{chen2017zoo}}
   \taxobox{Black-box}{Evasion}{Targ./Untarg.}
   \begin{block}{}
     \begin{align*}
@@ -604,7 +603,7 @@
 
 \begin{frame}
   \frametitle{Hidden Trigger Backdoor Attack}
-
+  \framesubtitle{\cite{saha2020hidden}}
   \taxobox{White-box}{Poisoning}{Targeted}
 
   \begin{itemize}
@@ -623,14 +622,14 @@
 \includegraphics[width=0.95\textwidth, height=0.62\textheight, keepaspectratio]{HTBA_process.png}
 
 \vskip12pt
-Taken from [!!!].
+Taken from \cite{saha2020hidden}.
 \vfill
 \end{frame}
 
 
 \begin{frame}
   \frametitle{Hiding the trigger}
-
+  \framesubtitle{\cite{saha2020hidden}}
   \taxobox{White-box}{Poisoning}{Targeted}
 
   \begin{itemize}
@@ -651,9 +650,11 @@ Taken from [!!!].
   
 \end{frame}
 
+\attackframe{Narcissus}
+
 \begin{frame}
   \frametitle{Narcissus}
-
+  \framesubtitle{\cite{zeng2023narcissus}}
   \taxobox{Black-box}{Poisoning}{Targeted}
 
   \begin{itemize}
@@ -668,7 +669,7 @@ Taken from [!!!].
 
 \begin{frame}
   \frametitle{Narcissus}
-
+  \framesubtitle{\cite{zeng2023narcissus}}
   \taxobox{Black-box}{Poisoning}{Targeted}
 
   \begin{itemize}
@@ -682,7 +683,7 @@ Taken from [!!!].
 
 \begin{frame}
   \frametitle{Narcissus}
-
+  \framesubtitle{\cite{zeng2023narcissus}}
   \taxobox{Black-box}{Poisoning}{Targeted}
 
   \begin{itemize}
