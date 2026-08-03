@@ -373,7 +373,7 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
 \end{frame}
 
 \begin{frame}
-  \frametitle{[Results/Significance]}
+  \frametitle{Fast Gradient Sign Method}
   \framesubtitle{Goodfellow et al., 2014}
 
   \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
@@ -523,83 +523,6 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \frametitle{Jacobian-Based Dataset Augmentation}
-  \framesubtitle{Papernot et al., 2017}
-
-  \taxobox{Black-box}{Evasion}{???}{???}
-
-  \begin{itemize}
-    \item Assumption: No knowledge of model parameters, dataset 
-    \linebreak Access to somewhat representative inputs is granted (e.g. natural images) 
-    \item How do we construct a suitable substitute?
-    \item Construct an artificial dataset!
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Jacobian-Based Dataset Augmentation}
-  \framesubtitle{Papernot et al., 2017}
-
-  \taxobox{Black-box}{Evasion}{???}{???}
-
-  \begin{itemize}
-    \item Assumption: No knowledge of model parameters, dataset 
-    \linebreak Access to somewhat representative inputs is granted (e.g. natural images) 
-    \item How do we construct a suitable substitute? (similar decision boundaries)
-    \item Construct an artificial dataset!
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Jacobian-Based Dataset Augmentation}
-  \framesubtitle{Papernot et al., 2017}
-
-  \taxobox{Black-box}{Evasion}{???}{???}
-
-  \begin{itemize}
-    \item Use target model as an oracle to label samples 
-    \item Strategy for sample selection is necessary
-    \item Idea: iteratively add meaningful samples to dataset
-    \item Use Jacobian for a heuristic
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Heuristic for meaningful directions}
-  \framesubtitle{Papernot et al., 2017}
-
-  \taxobox{Black-box}{Evasion}{???}{???}
-
-  \begin{block}{}
-    \begin{align*}
-      x = x + \alpha \cdot sign(J_f(x)[o(x)])
-    \end{align*}
-  \end{block}
-
-
-  \begin{itemize}
-    \item \(J_f(x)\): total derivative
-    \item \(J_f(x)[o(x)]\): total derivative, column of the correct label
-    \item[$\leadsto$] We move into the class region (according to the substitute)!
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Jacobian-Based Dataset Augmentation}
-  \framesubtitle{Papernot et al., 2017}
-
-  \taxobox{Black-box}{Evasion}{???}{???}
-
-  \begin{itemize}
-    \item 1) collect samples somewhat related to the input domain
-    \item 2) choose architecture for substitute
-    \item 3) target model labels current samples
-    \item 4) train substitute
-    \item 5) expand dataset: \( S_{N+1} := \{x = x + \alpha \cdot sign(J_f(x)[o(x)]) \mid x \in S_N\} \cup S_N\)
-    \item repeat (3) onwards
-  \end{itemize}
-\end{frame}
 
 \begin{frame}
   \frametitle{White-box attacks to improve transferability}
@@ -664,42 +587,6 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
 \section{Poisoning attacks}
 
 \begin{frame}
-  \frametitle{Poison Frogs}
-
-  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
-
-  \begin{itemize}
-    \item Goal: get ML model to misclassify one specific sample \(v\) into target class \(t\)
-    \item Assumption: model based on pretrained weights known to the attacker, access to data distribution
-    \item Restriction: adversary cannot choose labels
-    \item -> "clean-label attack"
-  \end{itemize}
-  
-\end{frame}
-
-\begin{frame}
-  \frametitle{Poison Frogs: poison instances}
-
-  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
-
-  \begin{itemize}
-    \item Sample instance \(b\) of target class \(t\)
-    \item Poison instance(s):
-  \end{itemize}
-  \begin{block}{}
-    \begin{align*}
-      p = \arg\min_x {\lvert \lvert g(x) - g(v) \rvert \rvert_{2}^2 + \lambda \lvert \lvert x - b \rvert \rvert_{2}^2} 
-    \end{align*}
-  \end{block}
-
-  \begin{itemize}
-    \item \(g\): feature representation (second-to-last layer output)
-    \item keep \(x\) close to \(v\) in feature space, but close to \(b\) in pixel space
-  \end{itemize}
-  
-\end{frame}
-
-\begin{frame}
   \frametitle{Hidden Trigger Backdoor Attack}
 
   \taxobox{Black-box}{???}{}{???}
@@ -711,6 +598,18 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
     \item -> "clean-label attack"
   \end{itemize}
   
+\end{frame}
+
+\begin{frame}
+\frametitle{HTBA: The approach}
+
+\vfill
+\centering
+\includegraphics[width=0.95\textwidth, height=0.62\textheight, keepaspectratio]{HTBA_process.png}
+
+\vskip12pt
+Taken from [!!!].
+\vfill
 \end{frame}
 
 \begin{frame}
@@ -968,8 +867,115 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
   \end{columns}
 \end{frame}
 
-\appendix
 
+
+% BACKUP SLIDES
+\begin{frame}
+  \frametitle{Jacobian-Based Dataset Augmentation}
+  \framesubtitle{Papernot et al., 2017}
+
+  \taxobox{Black-box}{Evasion}{???}{???}
+
+  \begin{itemize}
+    \item Assumption: No knowledge of model parameters, dataset 
+    \linebreak Access to somewhat representative inputs is granted (e.g. natural images) 
+    \item How do we construct a suitable substitute? (similar decision boundaries)
+    \item Construct an artificial dataset!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Jacobian-Based Dataset Augmentation}
+  \framesubtitle{Papernot et al., 2017}
+
+  \taxobox{Black-box}{Evasion}{???}{???}
+
+  \begin{itemize}
+    \item Use target model as an oracle to label samples 
+    \item Strategy for sample selection is necessary
+    \item Idea: iteratively add meaningful samples to dataset
+    \item Use Jacobian for a heuristic
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Heuristic for meaningful directions}
+  \framesubtitle{Papernot et al., 2017}
+
+  \taxobox{Black-box}{Evasion}{???}{???}
+
+  \begin{block}{}
+    \begin{align*}
+      x = x + \alpha \cdot sign(J_f(x)[o(x)])
+    \end{align*}
+  \end{block}
+
+
+  \begin{itemize}
+    \item \(J_f(x)\): total derivative
+    \item \(J_f(x)[o(x)]\): total derivative, column of the correct label
+    \item[$\leadsto$] We move into the class region (according to the substitute)!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Jacobian-Based Dataset Augmentation}
+  \framesubtitle{Papernot et al., 2017}
+
+  \taxobox{Black-box}{Evasion}{???}{???}
+
+  \begin{itemize}
+    \item 1) collect samples somewhat related to the input domain
+    \item 2) choose architecture for substitute
+    \item 3) target model labels current samples
+    \item 4) train substitute
+    \item 5) expand dataset: \( S_{N+1} := \{x = x + \alpha \cdot sign(J_f(x)[o(x)]) \mid x \in S_N\} \cup S_N\)
+    \item repeat (3) onwards
+  \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{Poison Frogs}
+
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
+
+  \begin{itemize}
+    \item Goal: get ML model to misclassify one specific sample \(v\) into target class \(t\)
+    \item Assumption: model based on pretrained weights known to the attacker, access to data distribution
+    \item Restriction: adversary cannot choose labels
+    \item -> "clean-label attack"
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Poison Frogs: poison instances}
+
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
+
+  \begin{itemize}
+    \item Sample instance \(b\) of target class \(t\)
+    \item Poison instance(s):
+  \end{itemize}
+  \begin{block}{}
+    \begin{align*}
+      p = \arg\min_x {\lvert \lvert g(x) - g(v) \rvert \rvert_{2}^2 + \lambda \lvert \lvert x - b \rvert \rvert_{2}^2} 
+    \end{align*}
+  \end{block}
+
+  \begin{itemize}
+    \item \(g\): feature representation (second-to-last layer output)
+    \item keep \(x\) close to \(v\) in feature space, but close to \(b\) in pixel space
+  \end{itemize}
+  
+\end{frame}
+
+
+
+
+\appendix
 % ==========================================================================
 % REFERENCES
 % ==========================================================================
