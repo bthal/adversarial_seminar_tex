@@ -42,17 +42,22 @@
 % We therefore keep outline=0 and insert section outlines ourselves below.
 \usetheme[authorinfo=1, progress=1, outline=0]{AIM}
 
-% Taxonomy tag for a method slide: knowledge / stage / goal / constraint.
+% The theme's `section page' template references the colour mDarkTeal, which it
+% never defines (a leftover from the metropolis theme) -- \sectionpage therefore
+% raises "Undefined color". Alias it to the AIM title blue.
+\colorlet{mDarkTeal}{rwth-blue-100}
+
+% Taxonomy tag for a method slide: knowledge / stage / goal.
 % Pinned to the page's top-right corner, vertically level with the frame title.
 % Needs `remember picture' -> two compilation passes (latexmk handles this).
 % The offset is tuned to the AIM frametitle band and lines up whether or not
 % the slide carries a \framesubtitle.
-\newcommand{\taxobox}[4]{%
+\newcommand{\taxobox}[3]{%
   \begin{tikzpicture}[remember picture, overlay]
     \node[anchor=north east, draw=rwth-blue-75, fill=rwth-blue-10,
           rounded corners, inner sep=4pt, font=\scriptsize]
       at ($(current page.north east)+(-0.5cm,-0.42cm)$)
-      {#1 \;$\cdot$\; #2 \;$\cdot$\; #3 \;$\cdot$\; #4};
+      {#1 \;$\cdot$\; #2 \;$\cdot$\; #3};
   \end{tikzpicture}%
 }
 
@@ -66,27 +71,30 @@
 % image on the first line's baseline instead.
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
 
+% The theme's \plainframe centres its argument inside a minipage of height
+% \paperheight, but the frame's text area is smaller -- so every divider logs a
+% spurious 21pt "Overfull \vbox". With 8 dividers that noise would hide real
+% overflows, so we re-define it to centre the same content without the oversized
+% minipage. Visually identical; drop this block to go back to the theme version.
+\renewcommand{\plainframe}[2][lightgrey]{%
+  {%
+  \setbeamertemplate{footline}{}%
+  \setbeamercolor{background canvas}{bg=#1}%
+  \begin{frame}[c]
+    \begin{center}\Large #2\end{center}
+  \end{frame}%
+  }%
+}
+
+% Divider slide announcing an attack. The theme's \plainframe defaults to a
+% lightgrey canvas and prints its argument in white, so both are overridden.
+\newcommand{\attackframe}[1]{\plainframe[white]{\textcolor{rwth-blue-100}{#1}}}
+
 % Significance box --- used on the closing slide of every attack to state, in
 % 1--3 bullets, what the technique is remembered for and why it matters.
 \newenvironment{significance}
   {\begin{exampleblock}{Significance}\begin{itemize}}
   {\end{itemize}\end{exampleblock}}
-
-% Cumulative "arc of the field" recap. \arcframe{n} shows the first n methods.
-\newcommand{\arcframe}[1]{%
-  \begin{frame}[c]
-    \frametitle{The arc of the field}
-    \begin{itemize}
-      \item[2013] \textbf{L-BFGS} --- expensive, but proves concept
-      \ifnum#1>1\relax
-        \item[2016] \textbf{DeepFool} --- minimal perturbation via iterative linear approximation
-      \fi
-      \ifnum#1>2\relax
-        \item[2017] \textbf{C\&W} --- reformulate optimisation
-      \fi
-    \end{itemize}
-  \end{frame}%
-}
 
 \AtBeginSection[]{%
   \begingroup
@@ -130,65 +138,66 @@
 \begin{frame}
   \frametitle{Which one is the gibbon?}
 
-  \vfill
-  \begin{columns}[c]
-    \column{0.48\textwidth}
-    \centering
-    \includegraphics[height=0.58\textheight]{panda.png}
-
-    \column{0.48\textwidth}
-    \centering
-    \includegraphics[height=0.58\textheight]{gibbon.png}
-  \end{columns}
-  \vfill
-\end{frame}
-
-\begin{frame}
-  \frametitle{Which one is the gibbon?}
-
+  % \uncover, not \only: it typesets the label invisibly on overlay 1, so the
+  % space is already reserved and the images do not shift when the labels appear.
   \vfill
   \begin{columns}[c]
     \column{0.48\textwidth}
     \centering
     \includegraphics[height=0.58\textheight]{panda.png}\\[6pt]
-    \textbf{panda}
+    \uncover<2->{\textbf{panda}}
 
     \column{0.48\textwidth}
     \centering
     \includegraphics[height=0.58\textheight]{gibbon.png}\\[6pt]
-    \textbf{gibbon}
+    \uncover<2->{\textbf{gibbon}}
   \end{columns}
   \vfill
 \end{frame}
 
 \begin{frame}
-  \frametitle{A fragile foundation}
+  \frametitle{Adversarial Examples}
 
-  \ig{0.85}{panda_gibbon.png}
+  \ig{0.95}{panda-gibbon-reduced.png}
 
   \vfill
   \refer{Goodfellow et al., 2014}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[c]
+  \frametitle{Adversarial Examples}
+
+  \vfill
+  \centering
+  \begin{tikzpicture}[
+      >=stealth,
+      box/.style={draw=rwth-blue-75, fill=rwth-blue-10, rounded corners,
+                  align=center, inner sep=8pt, text width=3.6cm, font=\small},
+      every path/.style={rwth-black-75, thick}]
+    \node[box] (p) at (0,0) {Small\\perturbation};
+    \node[box] (m) at (6.2, 1.5) {Misclassified\\by machine};
+    \node[box] (h) at (6.2,-1.5) {Indistinguishable\\to human};
+    \draw[->] (p.east) -- (m.west);
+    \draw[->] (p.east) -- (h.west);
+  \end{tikzpicture}
+  \vfill
+\end{frame}
+
+\begin{frame}[c]
   \frametitle{Transferability}
 
   \begin{columns}[c]
     \column{0.54\textwidth}
     \begin{itemize}[<+->]
-      \item An adversarial example crafted against one model often fools other models as well
-      \item Survives a change of architecture as well as of training data,
-            initialisation, hyperparameters
-      \item Vulnerability apparently \emph{inherent to
-            problem itself}, not to one model or one architecture
+      \item Attacks transfer across architectures, training data, and more
+      \item[$\leadsto$] Adv. ex. are properties of a problem itself
     \end{itemize}
 
     \column{0.42\textwidth}
     \centering
-    \includegraphics[width=0.46\textwidth, height=0.21\textheight, keepaspectratio]{cnn.png}\hfill
-    \includegraphics[width=0.46\textwidth, height=0.21\textheight, keepaspectratio]{dnn.jpg}\\[8pt]
-    \includegraphics[width=0.46\textwidth, height=0.21\textheight, keepaspectratio]{svm.png}\hfill
-    \includegraphics[width=0.46\textwidth, height=0.21\textheight, keepaspectratio]{kNN.png}
+    \includegraphics[width=0.46\textwidth, height=0.23\textheight, keepaspectratio]{dnn.jpg}\hfill
+    \includegraphics[width=0.46\textwidth, height=0.23\textheight, keepaspectratio]{svm.png}\\[8pt]
+    \includegraphics[width=0.46\textwidth, height=0.23\textheight, keepaspectratio]{kNN.png}
   \end{columns}
 
   \vfill
@@ -201,22 +210,17 @@
   \begin{columns}[c]
     \column{0.52\textwidth}
     \begin{itemize}[<+->]
-      \item \textbf{Fundamental blind spot}: model
-            and human do not share one understanding of input
-      \item Raises questions about \textbf{reliability} of systems
-      \item More pressing as systems are entering deeper and deeper into
-            \textbf{everyday life} and critical infrastructure
+      \item \textbf{Fundamental blind spot} while integrated AI systems require high reliability
     \end{itemize}
 
     \column{0.44\textwidth}
     \centering
-    \includegraphics[width=0.86\textwidth, height=0.24\textheight, keepaspectratio]{medical-imaging.jpg}\\[4pt]
-    \includegraphics[width=0.86\textwidth, height=0.24\textheight, keepaspectratio]{tesla-autopilot.png}\\[4pt]
-    \includegraphics[width=0.86\textwidth, height=0.24\textheight, keepaspectratio]{passport-egates.jpg}
+    \includegraphics[width=0.92\textwidth, height=0.34\textheight, keepaspectratio]{medical-imaging.jpg}\\[6pt]
+    \includegraphics[width=0.92\textwidth, height=0.34\textheight, keepaspectratio]{passport-egates.jpg}
   \end{columns}
 
   \vfill
-  {\tiny\refer{Images: medicalimaging.na; evsmarts.com; thetravelimages.com}}
+  {\tiny\refer{Images: medicalimaging.na; thetravelimages.com}}
 \end{frame}
 
 \begin{frame}
@@ -225,60 +229,45 @@
 \end{frame}
 
 % ==========================================================================
-\section{What is an adversarial example?}
-% ==========================================================================
-
-\begin{frame}
-  \frametitle{What is an Adversarial Example?}
-
-  \begin{block}{Definition (Adversarial Example)}
-    An \emph{adversarial example} is an \textbf{input to a machine learning model} that has been intentionally perturbed, typically \textbf{in a subtle and often imperceptible manner}, such that the model \textbf{produces an incorrect prediction} while the semantic content of the input remains unchanged.
-  \end{block}
-
-  \begin{itemize}
-    \item<2-> \textbf{Machine learning models}: No quirk of deep networks, but a general property of machine learners
-    \item<3-> \textbf{Subtle and imperceptible perturbations}: mathematically small under a chosen norm / visually imperceptible to humans
-    \item<4-> \textbf{Produces an incorrect predition}: The machine learner is fooled where the human would not have been
-  \end{itemize}
-\end{frame}
-
-% ==========================================================================
-\section{Taxonomy}
+\section{Evasion attacks}
 % ==========================================================================
 
 \begin{frame}[c]
-  \frametitle{Four orthogonal axes}
+  \frametitle{Taxonomy \& Terminology}
 
-  \begin{itemize}
-    \item \textbf{Attacker knowledge}: White-box vs.\ Black-box
-    \item \textbf{Attack stage}: Evasion (at testing time) vs.\ Poisoning (at training time)
-    \item \textbf{Attack goal}: Targeted (specific target label) vs.\ Untargeted (just any wrong label)
-    \item \textbf{Perturbation constraint}: which Norm, which Budget
-  \end{itemize}
+  \vfill
+  \begin{columns}[t]
+    \column{0.31\textwidth}
+    \centering
+    \textbf{Attacker knowledge}\\[8pt]
+    White-box\\[4pt]
+    {\refer{vs.}}\\[4pt]
+    Black-box
 
+    \column{0.34\textwidth}
+    \centering
+    \textbf{Attack stage}\\[8pt]
+    Evasion \refer{(at test time)}\\[4pt]
+    {\refer{vs.}}\\[4pt]
+    Poisoning \refer{(at training time)}
+
+    \column{0.33\textwidth}
+    \centering
+    \textbf{Attack goal}\\[8pt]
+    Targeted \refer{(specific wrong label)}\\[4pt]
+    {\refer{vs.}}\\[4pt]
+    Untargeted \refer{(any wrong label)}
+  \end{columns}
+  \vfill
 \end{frame}
 
-\begin{frame}
-\frametitle{Measuring ``small'': the $\ell_p$ norms}
-
-\vfill
-\centering
-\includegraphics[width=0.95\textwidth, height=0.62\textheight, keepaspectratio]{norms.png}
-
-\vskip12pt
-Norm defines the \textbf{perturbation budget $\epsilon$}.
-\vfill
-\end{frame}
-
-% ==========================================================================
-\section{Evasion attacks}
-% ==========================================================================
+\attackframe{L-BFGS}
 
 \begin{frame}
   \frametitle{L-BFGS}
   \framesubtitle{Szegedy et al., 2013}
 
-  \taxobox{White-box}{Evasion}{Targeted}{$\ell_2$}
+  \taxobox{White-box}{Evasion}{Targeted}
 
   \begin{block}{}
     \begin{align*}
@@ -289,9 +278,9 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
   \end{block}
 
   \begin{itemize}
-    \item $f$ has no gradient --- it returns a discrete class label,  $f(x+\delta) = t$ is a hard, non-differentiable condition.
-    \item Derivative-based optimisers such as L-BFGS need a gradient to move at all.
-    \item[$\leadsto$] Reformulate.
+    \item $f$ has no gradient --- it returns a discrete class label,  $f(x+\delta) = t$ is a hard, non-differentiable condition
+    \item Derivative-based optimisers such as L-BFGS need a gradient to move at all
+    \item[$\leadsto$] Reformulate
   \end{itemize}
 \end{frame}
 
@@ -299,7 +288,7 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
   \frametitle{L-BFGS}
   \framesubtitle{Szegedy et al., 2013}
 
-  \taxobox{White-box}{Evasion}{Targeted}{$\ell_2$}
+  \taxobox{White-box}{Evasion}{Targeted}
 
   \begin{block}{}
     \begin{align*}
@@ -308,19 +297,19 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
   \end{block}
 
   \begin{significance}
-    \item First method to \textbf{reliably generate} adversarial examples.
-    \item Computationally expensive --- far too slow to be practical.
-    \item[$\leadsto$] It \emph{proved a point} rather than providing a usable attack.
+    \item First method to \textbf{reliably generate} adversarial examples
+    \item Computationally expensive --- far too slow to be practical
+    \item[$\leadsto$] It \emph{proved a point} rather than providing a usable attack
   \end{significance}
 \end{frame}
 
-\arcframe{1}
+\attackframe{Fast Gradient Sign Method (FGSM)}
 
 \begin{frame}
   \frametitle{Fast Gradient Sign Method}
   \framesubtitle{Goodfellow et al., 2014}
 
-  \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
+  \taxobox{White-box}{Evasion}{Untargeted}
   \begin{block}{}
     
   \end{block}
@@ -338,6 +327,10 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
 \centering
 \includegraphics[width=0.95\textwidth, height=0.7\textheight, keepaspectratio]{activation_functions.png}
 
+  %\taxobox{White-box}{Evasion}{Targeted}
+  \begin{block}{}
+    ...
+  \end{block}
 \end{frame}
 
 
@@ -345,7 +338,7 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
   \frametitle{Fast Gradient Sign Method}
   \framesubtitle{Goodfellow et al., 2014}
 
-  \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
+  \taxobox{White-box}{Evasion}{Untargeted}
   
   \begin{itemize}
     \item Linearise the loss function:
@@ -356,7 +349,7 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
     \]
     \end{block}
     \item Maximised by $\delta = \epsilon \cdot sign(\nabla_x L_f(x, y))$
-    \item[$\leadsto$] single step in gradient direction
+    \item[$\leadsto$] Single step in gradient direction
   \end{itemize}
 \end{frame}
 
@@ -364,7 +357,7 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
   \frametitle{Fast Gradient Sign Method - Example}
   \framesubtitle{Goodfellow et al., 2014}
 
-  \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
+  \taxobox{White-box}{Evasion}{Untargeted}
   
   \begin{block}{}
     placeholder: step graph here
@@ -376,360 +369,12 @@ Norm defines the \textbf{perturbation budget $\epsilon$}.
   \frametitle{Fast Gradient Sign Method}
   \framesubtitle{Goodfellow et al., 2014}
 
-  \taxobox{White-box}{Evasion}{Untargeted}{$\ell_\infty$}
+  \taxobox{White-box}{Evasion}{Untargeted}
   
   \begin{itemize}
     \item Maximised by $\delta = \epsilon \cdot sign(\nabla_x L_f(x, y))$
-    \item[$\leadsto$] single step in gradient direction
+    \item[$\leadsto$] Single step in gradient direction
   \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{PGD}
-  \framesubtitle{Madry et al., 2017}
-
-  \taxobox{White-box}{Evasion}{???}{???}
-  \begin{block}{}
-    General formulation of adversarial training [...! incl. defenders part?]. Adversary solves
-    \[
-    \max_{\delta\in S}L_f(x+\delta, y)
-    \]
-  \end{block}
-  \begin{itemize}
-    \item FGSM: Use \(S=\{\delta \mid \lVert \delta \rVert_\infty \leq \epsilon\}\)
-    \item Use projected gradient descent to optimise
-    \item[$\leadsto$] Models may be too linear
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{PGD - a general first-order attack?}
-  \framesubtitle{Madry et al., 2017}
-
-  \taxobox{White-box}{Evasion}{???}{???}
-  
-\end{frame}
-
-
-
-\begin{frame}
-  \frametitle{DeepFool}
-  \framesubtitle{Moosavi-Dezfooli et al., 2016 --- the affine, binary case}
-
-  \taxobox{White-box}{Evasion}{Untargeted}{$\ell_2$}
-
-  \begin{columns}[c]
-    \column{0.55\textwidth}
-    \begin{itemize}
-      \item For an affine $f(x) = w^\top x + b$, the decision boundary
-            $\mathcal{F}$ is a \emph{hyperplane}
-      \item Minimal perturbation is \emph{orthogonal projection} of $x$
-            onto $\mathcal{F}$ $\rightarrow$ closed form
-    \end{itemize}
-
-    \column{0.43\textwidth}
-    \centering
-    \includegraphics[width=\textwidth, height=0.46\textheight, keepaspectratio]{affine-monoclass.png}
-  \end{columns}
-\end{frame}
-
-\begin{frame}
-  \frametitle{DeepFool}
-  \framesubtitle{Moosavi-Dezfooli et al., 2016 --- the general, multiclass case}
-
-  \taxobox{White-box}{Evasion}{Untargeted}{$\ell_2$}
-
-  \begin{columns}[c]
-    \column{0.55\textwidth}
-    \begin{itemize}
-      \item \textbf{Non-linear:} iterative $\rightarrow$ linearise the
-            score function at current point (first-order Taylor), project onto that
-            hyperplane, repeat until label flips.
-      \item \textbf{Multiclass:}
-            Linearise \emph{every} class boundary, project onto the \textbf{closest}.
-    \end{itemize}
-
-    \column{0.43\textwidth}
-    \centering
-    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{nonlinear-multiclass.png}
-  \end{columns}
-
-  \vskip2pt
-  \begin{significance}
-    \item Gave problem a \textbf{geometric reading}: robustness as distance
-          to the decision boundary.
-    \item First to \textbf{extend to any $\ell_p$ norm}, $p \in [1, \infty)$.
-  \end{significance}
-\end{frame}
-
-\arcframe{2}
-
-\begin{frame}
-  \frametitle{Carlini \& Wagner}
-  \framesubtitle{Carlini \& Wagner, 2017}
-
-  \taxobox{White-box}{Evasion}{Targeted}{$\ell_0 / \ell_2 / \ell_\infty$}
-
-  \begin{block}{}
-    \begin{align*}
-      \underbrace{\min_{\delta}\; c\,\|\delta\|_2 + L_f(x+\delta,\, t)}_{\text{L-BFGS}}
-      \qquad\longrightarrow\qquad
-      \underbrace{\min_{\delta}\; \|\delta\|_p + c\cdot \ell(x+\delta)}_{\text{C\&W}}
-    \end{align*}
-  \end{block}
-
-  \begin{itemize}
-    \item $\;\ell(x') = \max\!\big(\max_{i\neq t} z_i(x') - z_t(x'),\; 0\big)$.
-    \item Built so that $\ell(x') \le 0 \iff$ input is classified as $t$ $\rightarrow$ faithfully encodes the attack goal.
-    \item $c$ decided through \textbf{binary search}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Carlini \& Wagner}
-  \framesubtitle{Carlini \& Wagner, 2017}
-
-  \taxobox{White-box}{Evasion}{Targeted}{$\ell_0 / \ell_2 / \ell_\infty$}
-
-  \begin{block}{}
-    \begin{align*}
-      x' = \tfrac{1}{2}\big(\tanh(w) + 1\big),
-      \qquad w \in \mathbb{R}^m
-    \end{align*}
-  \end{block}
-
-  \begin{itemize}
-    \item mapping any $w \in \mathbb{R}^m$ into $(0,1)^m$ $\rightarrow$ every $w$
-          decodes to a \textbf{valid image} $\rightarrow$ dissolving box-constraint
-    \item Optimise $w$ \textbf{unconstrained} with Adam optimiser
-  \end{itemize}
-
-  \begin{significance}
-    \item Strongest attack of its time across $\ell_0 / \ell_2 / \ell_\infty$.
-    \item Broke \emph{defensive distillation}, exposing it as \emph{gradient masking}
-  \end{significance}
-\end{frame}
-
-\arcframe{3}
-
-\begin{frame}
-  \frametitle{Transfer attacks}
-
-  \begin{itemize}
-    \item Black-box attack pattern
-    \item Adversary creates and trains a substitute model for the target
-    \item Adversarial examples for substitute model are found (white-box!)
-    \item These can be used to attack the target
-  \end{itemize}
-\end{frame}
-
-
-\begin{frame}
-  \frametitle{White-box attacks to improve transferability}
-
-  \begin{itemize}
-    \item Adversarial examples can differ in transferability!
-    \item MI-FGSM: adds momentum to FGSM
-    \item Ensemble attacks
-    
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{ZOO: Zeroth order black-box attacks}
-
-  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
-
-  \begin{itemize}
-    \item Black-box attack without substitute model
-    \item No quality loss due to transfer
-    \item Assumptions: Adversary allowed to query, gets confidence scores
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Coordinate-wise pseudo gradient}
-
-  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
-  \begin{block}{}
-    \begin{align*}
-      \hat{g_i}
-      := \frac{\partial l(x)}{\partial x_i}
-      \approx \frac{l(x + he_i) - l(x - he_i)}{2h}
-    \end{align*}
-  \end{block}
-
-  \begin{itemize}
-    \item \(l\) loss function based on confidence scores
-    \item Two queries per coordinate, full gradient infeasible
-    \item -> Coordinate descent using first and/or second-order method
-  \end{itemize}
-\end{frame}
-
-\begin{frame}
-  \frametitle{Proposed loss function}
-
-  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
-
-  \begin{itemize}
-    \item Reminder: Carlini-Wagner loss:
-      \(\;\ell(x') = \max\!\big(\max_{i\neq t} z_i(x') - z_t(x'),\; 0\big)\) 
-    \item Targeted ZOO: \(l(x,t) = \max\{ \max_{i\neq t} \{\log[f(x)]_i\} - \log[f(x)]_t,-\kappa \}\)
-    \item Untargeted ZOO: \(l(x) = \max\{ \log[f(x)]_{y} - \max_{i\neq y} \{\log[f(x)]_i\} ,-\kappa \}\)
-  \end{itemize}
-  \begin{itemize}
-    \item \(log\) to estimate logits
-  \end{itemize}
-\end{frame}
-
-% ==========================================================================
-% Kept as an outline entry only --- slides to be added later.
-\section{Poisoning attacks}
-
-\begin{frame}
-  \frametitle{Hidden Trigger Backdoor Attack}
-
-  \taxobox{Black-box}{???}{}{???}
-
-  \begin{itemize}
-    \item Goal: get ML model to misclassify any sample with trigger pattern into target class \(t\)
-    \item Assumption: model based on pretrained weights known to the attacker, access to data distribution
-    \item Restriction: adversary cannot choose labels
-    \item -> "clean-label attack"
-  \end{itemize}
-  
-\end{frame}
-
-\begin{frame}
-\frametitle{HTBA: The approach}
-
-\vfill
-\centering
-\includegraphics[width=0.95\textwidth, height=0.62\textheight, keepaspectratio]{HTBA_process.png}
-
-\vskip12pt
-Taken from [!!!].
-\vfill
-\end{frame}
-
-\begin{frame}
-  \frametitle{Hiding the trigger}
-
-  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
-
-  \begin{itemize}
-    \item Sample instances \(s\) \(b\) of target class \(t\)
-    \item Apply trigger to source: patched source \(\tilde{s}\) 
-    \item Poison instances:
-  \end{itemize}
-  \begin{block}{}
-    \begin{align*}
-      \arg\min_x{\lvert \lvert g(x) - g(\tilde{s}) \rvert \rvert_{2}^2} \quad\quad \textbf{s.t.} \quad \lvert \lvert x - b \rvert \rvert_{\infty} < \epsilon
-    \end{align*}
-  \end{block}
-
-  \begin{itemize}
-    \item \(g\): feature representation (second-to-last layer output)
-    \item keep \(x\) close to \(\tilde{s}\) in feature space, but close to \(b\) in pixel space
-  \end{itemize}
-  
-\end{frame}
-
-\begin{frame}
-  \frametitle{Narcissus}
-
-  \taxobox{Black-box}{???}{}{???}
-
-  \begin{itemize}
-    \item Goal: get ML model to misclassify any sample with trigger pattern into target class \(t\)
-    \item Assumption: no access to model or data distribution
-    \item But: Access to "public out of distribution" data \(D_{POOD}\), target class examples \(D_t\)
-    \item Restriction: adversary cannot choose labels ("clean-label attack")
-    \item Now: Optimise the trigger pattern!
-  \end{itemize}
-  
-\end{frame}
-
-\begin{frame}
-  \frametitle{Narcissus}
-
-  \taxobox{Black-box}{???}{}{???}
-
-  \begin{itemize}
-    \item Assume oracle \(f_{orc}\), which is the victim's model without poisoning
-    \item Choose trigger to maximise oracle's confidence on target class: \(\delta^{*} = \arg\min_{\delta\in S}{\sum_{(x,t)\in D_t}{L_{f_{orc}}(x+\delta, t)}}\)
-    \item Trigger now is related to the target class!
-    \item However: No access to \(f_{orc}\)
-  \end{itemize}
-  
-\end{frame}
-
-\begin{frame}
-  \frametitle{Narcissus}
-
-  \taxobox{Black-box}{???}{}{???}
-
-  \begin{itemize}
-    \item Train surrogate \(f_{sur}\) on \(D_{POOD}\), \(D_t\)
-    \item Use PGD to find \(\delta^{*} = \arg\min_{\delta\in S}{\sum_{(x,t)\in D_t}{L_{f_{sur}}(x+\delta, t)}}\)
-    \item Add trigger to portion of \(D_t\), give to victim
-    \item Exploit: Add trigger to desired input
-  \end{itemize}
-  
-\end{frame}
-
-% ==========================================================================
-
-% ==========================================================================
-\section{Discussion}
-% ==========================================================================
-
-\subsection{Physical adversarial attacks}
-
-\begin{frame}[c]
-  \frametitle{Physical adversarial attacks}
-
-  \vfill
-  \begin{columns}[c]
-    % two portrait-format images side by side
-    \column{0.34\textwidth}
-    \centering
-    \includegraphics[height=3.7cm]{adversarial-glasses.png}\hfill
-    \includegraphics[height=3.7cm]{adversarial-t-shirt.png}\\[3pt]
-    {\tiny\refer{Sharif et al., 2016 \quad$\cdot$\quad Xu et al., 2020}}
-
-    % two wide-format images stacked
-    \column{0.62\textwidth}
-    \centering
-    \includegraphics[width=0.96\linewidth]{adversarial-stickers-on-stop-signs.png}\\[2pt]
-    {\tiny\refer{Eykholt et al., 2018}}\\[7pt]
-    \includegraphics[width=0.96\linewidth]{adversarial-turtle.png}\\[2pt]
-    {\tiny\refer{Athalye et al., 2018}}
-  \end{columns}
-\end{frame}
-
-\begin{frame}[c]
-  \frametitle{Real-life adversarial attacks}
-
-  \begin{itemize}
-    \item<1-> Real confirmed malicious attacks are surprisingly rare
-    \item<2-> Two candidate explanations:
-    \begin{enumerate}
-      \item<2-> They slip through unnoticed, logged as ordinary misclassifications
-      \item<2-> They are simply of little use to actual attackers
-    \end{enumerate}
-    \item<3-> Case for the second:
-    \begin{itemize}
-      \item<3-> Needs ML \emph{and} security expertise
-      \item<3-> DDoS, character obfuscation, packing a binary etc. $\rightarrow$ cheap, fast, effective
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\subsection{Explaining adversarial examples}
-
-\begin{frame}
-  \frametitle{Explaining adversarial examples}
 \end{frame}
 
 \begin{frame}
@@ -802,6 +447,298 @@ Taken from [!!!].
   \end{columns}
 \end{frame}
 
+\attackframe{Projected Gradient Descent (PGD)}
+
+\begin{frame}
+  \frametitle{PGD}
+  \framesubtitle{Madry et al., 2017}
+
+  \taxobox{White-box}{Evasion}{???}
+  \begin{block}{}
+    General formulation of adversarial training [...! incl. defenders part?]. Adversary solves
+    \[
+    \max_{\delta\in S}L_f(x+\delta, y)
+    \]
+  \end{block}
+  \begin{itemize}
+    \item FGSM: Use \(S=\{\delta \mid \lVert \delta \rVert_\infty \leq \epsilon\}\)
+    \item Use projected gradient descent to optimise
+    \item[$\leadsto$] Models may be too linear
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{PGD - a general first-order attack?}
+  \framesubtitle{Madry et al., 2017}
+
+  \taxobox{White-box}{Evasion}{???}
+  
+\end{frame}
+
+
+
+\attackframe{DeepFool}
+
+\begin{frame}
+  \frametitle{DeepFool}
+  \framesubtitle{Moosavi-Dezfooli et al., 2016 - the affine, binary case}
+
+  \taxobox{White-box}{Evasion}{Untargeted}
+
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+    \begin{itemize}
+      \item Decision boundary is a \emph{hyperplane}
+      \item Minimal perturbation is \emph{orthogonal projection} of $x$
+            onto $\mathcal{F}$ $\rightarrow$ closed form
+    \end{itemize}
+
+    \column{0.43\textwidth}
+    \centering
+    \includegraphics[width=\textwidth, height=0.46\textheight, keepaspectratio]{affine-monoclass.png}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{DeepFool}
+  \framesubtitle{Moosavi-Dezfooli et al., 2016 - the general, multiclass case}
+
+  \taxobox{White-box}{Evasion}{Untargeted}
+
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+    \begin{itemize}
+      \item \textbf{Non-linear:} iterative $\rightarrow$ linearise the
+            score function at current point (first-order Taylor), project onto that
+            hyperplane, repeat until label flips
+      \item \textbf{Multiclass:}
+            Linearise \emph{every} class boundary, project onto the \textbf{closest}
+    \end{itemize}
+
+    \column{0.43\textwidth}
+    \centering
+    \includegraphics[width=\textwidth, height=0.5\textheight, keepaspectratio]{nonlinear-multiclass.png}
+  \end{columns}
+
+  \vskip2pt
+  \begin{significance}
+    \item \textbf{Geometric reading}: robustness as distance to the decision boundary
+  \end{significance}
+\end{frame}
+
+\attackframe{Transfer attacks}
+
+\begin{frame}
+  \frametitle{Transfer attacks}
+
+  \begin{itemize}
+    \item Black-box attack pattern
+    \item Adversary creates and trains a substitute model for the target
+    \item Adversarial examples for substitute model are found (white-box!)
+    \item These can be used to attack the target
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Jacobian-Based Dataset Augmentation}
+  \framesubtitle{Papernot et al., 2017}
+
+  \taxobox{Black-box}{Evasion}{???}
+
+  \begin{itemize}
+    \item Assumption: No knowledge of model parameters, dataset 
+    \linebreak Access to somewhat representative inputs is granted (e.g. natural images) 
+    \item How do we construct a suitable substitute?
+    \item Construct an artificial dataset!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Jacobian-Based Dataset Augmentation}
+  \framesubtitle{Papernot et al., 2017}
+
+  \taxobox{Black-box}{Evasion}{???}
+
+  \begin{itemize}
+    \item Assumption: No knowledge of model parameters, dataset 
+    \linebreak Access to somewhat representative inputs is granted (e.g. natural images) 
+    \item How do we construct a suitable substitute? (similar decision boundaries)
+    \item Construct an artificial dataset!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Jacobian-Based Dataset Augmentation}
+  \framesubtitle{Papernot et al., 2017}
+
+  \taxobox{Black-box}{Evasion}{???}
+
+  \begin{itemize}
+    \item Use target model as an oracle to label samples 
+    \item Strategy for sample selection is necessary
+    \item Idea: iteratively add meaningful samples to dataset
+    \item Use Jacobian for a heuristic
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Heuristic for meaningful directions}
+  \framesubtitle{Papernot et al., 2017}
+
+  \taxobox{Black-box}{Evasion}{???}
+
+  \begin{block}{}
+    \begin{align*}
+      x = x + \alpha \cdot sign(J_f(x)[o(x)])
+    \end{align*}
+  \end{block}
+
+
+  \begin{itemize}
+    \item \(J_f(x)\): total derivative
+    \item \(J_f(x)[o(x)]\): total derivative, column of the correct label
+    \item[$\leadsto$] We move into the class region (according to the substitute)!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Jacobian-Based Dataset Augmentation}
+  \framesubtitle{Papernot et al., 2017}
+
+  \taxobox{Black-box}{Evasion}{???}
+
+  \begin{itemize}
+    \item 1) Collect samples somewhat related to the input domain
+    \item 2) Choose architecture for substitute
+    \item 3) Target model labels current samples
+    \item 4) Train substitute
+    \item 5) Expand dataset: \( S_{N+1} := \{x = x + \alpha \cdot sign(J_f(x)[o(x)]) \mid x \in S_N\} \cup S_N\)
+    \item Repeat (3) onwards
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{White-box attacks to improve transferability}
+
+  \begin{itemize}
+    \item Adversarial examples can differ in transferability!
+    \item MI-FGSM: adds momentum to FGSM
+    \item Ensemble attacks
+    
+  \end{itemize}
+\end{frame}
+
+\attackframe{ZOO}
+
+\begin{frame}
+  \frametitle{ZOO: Zeroth order black-box attacks}
+
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}
+
+  \begin{itemize}
+    \item Black-box attack without substitute model
+    \item No quality loss due to transfer
+    \item Assumptions: Adversary allowed to query, gets confidence scores
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Coordinate-wise pseudo gradient}
+
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}
+  \begin{block}{}
+    \begin{align*}
+      \hat{g_i}
+      := \frac{\partial l(x)}{\partial x_i}
+      \approx \frac{l(x + he_i) - l(x - he_i)}{2h}
+    \end{align*}
+  \end{block}
+
+  \begin{itemize}
+    \item \(l\) loss function based on confidence scores
+    \item Two queries per coordinate, full gradient infeasible
+    \item -> Coordinate descent using first and/or second-order method
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Proposed loss function}
+
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}
+
+  \begin{itemize}
+    \item Reminder: Carlini-Wagner loss:
+      \(\;\ell(x') = \max\!\big(\max_{i\neq t} z_i(x') - z_t(x'),\; 0\big)\) 
+    \item Targeted ZOO: \(l(x,t) = \max\{ \max_{i\neq t} \{\log[f(x)]_i\} - \log[f(x)]_t,-\kappa \}\)
+    \item Untargeted ZOO: \(l(x) = \max\{ \log[f(x)]_{y} - \max_{i\neq y} \{\log[f(x)]_i\} ,-\kappa \}\)
+  \end{itemize}
+  \begin{itemize}
+    \item \(log\) to estimate logits
+  \end{itemize}
+\end{frame}
+
+% ==========================================================================
+% Kept as an outline entry only --- slides to be added later.
+\section{Poisoning attacks}
+
+\attackframe{Hidden Trigger Backdoor Attack}
+
+\begin{frame}
+  \frametitle{Hidden Trigger Backdoor Attack}
+
+  \taxobox{Black-box}{???}{}
+
+  \begin{itemize}
+    \item Goal: get ML model to misclassify any sample with trigger pattern into target class \(t\)
+    \item Similar threat model to Poison Frogs
+    \item Restriction: adversary cannot choose labels
+    \item -> "Clean-label attack"
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Hiding the trigger}
+
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}
+
+  \begin{itemize}
+    \item Sample instances \(s\) \(b\) of target class \(t\)
+    \item Apply trigger to source: patched source \(\tilde{s}\) 
+    \item Poison instances:
+  \end{itemize}
+  \begin{block}{}
+    \begin{align*}
+      \arg\min_x{\lvert \lvert g(x) - g(\tilde{s}) \rvert \rvert_{2}^2} \quad\quad \textbf{s.t.} \quad \lvert \lvert x - b \rvert \rvert_{\infty} < \epsilon
+    \end{align*}
+  \end{block}
+
+  \begin{itemize}
+    \item \(g\): feature representation (second-to-last layer output)
+    \item Keep \(x\) close to \(\tilde{s}\) in feature space, but close to \(b\) in pixel space
+  \end{itemize}
+  
+\end{frame}
+
+
+% ==========================================================================
+
+% ==========================================================================
+\section{Discussion}
+% ==========================================================================
+
+\subsection{Explaining adversarial examples}
+
+\begin{frame}[c]
+  \frametitle{Explaining adversarial examples}
+
+  \begin{itemize}[<+->]
+    \item[2013] \textbf{Szegedy et al.} --- quirks of non-linearity
+    \item[2014] \textbf{Goodfellow et al.} --- high-dimensional linearity
+    \item[2019] \textbf{Ilyas et al.} --- predictive but non-robust features
+  \end{itemize}
+\end{frame}
+
 \begin{frame}[c]
   \frametitle{Predictive and robust features}
   \framesubtitle{Ilyas et al., 2019}
@@ -822,12 +759,12 @@ Taken from [!!!].
 
   \vfill
   \begin{itemize}[<3->]
-    \item[$\leadsto$] \textbf{Predictive but non-robust:} Standard training happily relies on such features.
+    \item[$\leadsto$] \textbf{Predictive but non-robust:} Standard training happily relies on such features
   \end{itemize}
 \end{frame}
 
 \begin{frame}[c]
-  \frametitle{Non-robust features are real signal}
+  \frametitle{Experiment: "Mislabeled" training dataset}
   \framesubtitle{Ilyas et al., 2019}
 
   \vfill
@@ -835,6 +772,105 @@ Taken from [!!!].
   \includegraphics[width=0.82\textwidth, height=0.58\textheight, keepaspectratio]{dataset-robust-removed.png}
   \vfill
 \end{frame}
+
+\begin{frame}[c]
+  \frametitle{Real-life adversarial attacks}
+
+  \begin{itemize}
+    \item Real confirmed malicious attacks are surprisingly rare
+    \item Two candidate explanations:
+    \begin{enumerate}
+      \item They slip through unnoticed, logged as ordinary misclassifications
+      \item They are simply of little use to actual attackers
+    \end{enumerate}
+  \end{itemize}
+\end{frame}
+
+\subsection{Adversarial attacks as a subject of study}
+
+\begin{frame}[c]
+  \frametitle{Adversarial attacks as a subject of study}
+
+  % Explicit overlay specs, not [<+->]: with [<+->] the nested sub-bullets each
+  % consume their own step. Sub-bullets share their parent's spec.
+  \begin{itemize}
+    \item<1-> Not really significant security threat
+    \item<2-> Mainly \emph{epistemic significance}:
+    \begin{itemize}
+      \item<2-> Not: What can an attacker do?
+      \item<2-> But: What do they reveal about the targetted system?
+    \end{itemize}
+  \end{itemize}
+
+  \vfill
+  \begin{columns}[t]
+    \column{0.47\textwidth}
+    \begin{block}<3->{Before}
+      \begin{itemize}
+        \item Accuracy as near-single metric
+        \item Robustness assumed implicitly
+      \end{itemize}
+    \end{block}
+
+    \column{0.47\textwidth}
+    \begin{block}<4->{Afterwards}
+      \begin{itemize}
+        \item High accuracy $\neq$ human-like understanding
+        \item Robustness as property of interest
+      \end{itemize}
+    \end{block}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[c]
+  \frametitle{Key takeaways}
+
+  \begin{itemize}
+    \item Imperceptible perturbation $\rightarrow$ wrong prediction
+    \item Transferable across models, architectures, training data
+    \item Categories: white/black-box $\cdot$ evasion/poisoning $\cdot$ targeted/untargeted
+    \item Phenomenon still not fully explained
+    \item Marginal security threat so far but epistemic relevance
+  \end{itemize}
+\end{frame}
+
+% Closing slide --- deliberately has no \frametitle.
+\begin{frame}[c]
+  \begin{columns}[c]
+    \column{0.54\textwidth}
+    \centering
+    {\Large\bfseries\textcolor{rwth-blue-100}{Thank you for your attention!}}\\[14pt]
+    {\Large\textcolor{rwth-blue-100}{Questions?}}
+
+    \column{0.42\textwidth}
+    \centering
+    \includegraphics[width=0.80\linewidth, height=0.62\textheight, keepaspectratio]{panda-giving-thumbs-up.jpg}
+  \end{columns}
+\end{frame}
+
+\appendix
+
+% ==========================================================================
+% REFERENCES
+% ==========================================================================
+
+\begin{frame}[allowframebreaks]
+  \frametitle{References}
+  \printbibliography[heading=none]
+\end{frame}
+
+% ==========================================================================
+% BACKUP SLIDES  (on hold -- not part of the talk proper)
+% ==========================================================================
+% Clear the outline hook first: a \section here would otherwise fire
+% \AtBeginSection and emit a stray Outline slide inside the appendix.
+\AtBeginSection[]{}
+\section{Backup Slides}
+
+% \sectionpage would work now, but the theme's template wraps a \paperheight
+% minipage that overflows the frame by ~5.7pt. \plainframe is the template's own
+% divider idiom (see demo.tex) and is built for exactly this.
+\plainframe[white]{\textcolor{rwth-blue-100}{Backup Slides}}
 
 \begin{frame}[c]
   \frametitle{Why that works}
@@ -866,128 +902,111 @@ Taken from [!!!].
   \end{footnotesize}
 \end{frame}
 
-\subsection{Adversarial attacks as a subject of study}
 
-\begin{frame}[c]
-  \frametitle{Adversarial attacks as a subject of study}
-
-  % Explicit overlay specs, not [<+->]: with [<+->] the nested sub-bullets each
-  % consume their own step, which yields 11 overlays instead of 4. Sub-bullets
-  % share their parent's spec so they appear together with it.
-  \begin{itemize}
-    \item<1-> Not really significant security threat
-    \item<2-> Mainly \emph{epistemic significance}:
-    \begin{itemize}
-      \item<2-> Not: What can an attacker do?
-      \item<2-> But: What do they reveal about the targetted system?
-    \end{itemize}
-    \item<3-> Before
-    \begin{itemize}
-      \item<3-> Accuracy as near-single metric
-      \item<3-> Robustness assumed implicitly
-    \end{itemize}
-    \item<4-> Afterwards:
-    \begin{itemize}
-      \item<4-> High accuracy $\neq$ understanding the task as a human would
-      \item<4-> A more intricate account of how learners operate
-      \item<4-> Robustness as a distinct property of interest
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-% Closing slide --- deliberately has no \frametitle.
-\begin{frame}[c]
-  \begin{columns}[c]
-    \column{0.54\textwidth}
-    \centering
-    {\Large\bfseries\textcolor{rwth-blue-100}{Thank you for your attention!}}\\[14pt]
-    {\Large\textcolor{rwth-blue-100}{Questions?}}
-
-    \column{0.42\textwidth}
-    \centering
-    \includegraphics[width=0.80\linewidth, height=0.62\textheight, keepaspectratio]{panda-giving-thumbs-up.jpg}
-  \end{columns}
-\end{frame}
-
-
-
-% BACKUP SLIDES
 \begin{frame}
-  \frametitle{Jacobian-Based Dataset Augmentation}
-  \framesubtitle{Papernot et al., 2017}
+  \frametitle{What is an Adversarial Example?}
 
-  \taxobox{Black-box}{Evasion}{???}{???}
+  \begin{block}{Definition (Adversarial Example)}
+    An \emph{adversarial example} is an \textbf{input to a machine learning model} that has been intentionally perturbed, typically \textbf{in a subtle and often imperceptible manner}, such that the model \textbf{produces an incorrect prediction} while the semantic content of the input remains unchanged.
+  \end{block}
 
   \begin{itemize}
-    \item Assumption: No knowledge of model parameters, dataset 
-    \linebreak Access to somewhat representative inputs is granted (e.g. natural images) 
-    \item How do we construct a suitable substitute? (similar decision boundaries)
-    \item Construct an artificial dataset!
+    \item \textbf{Machine learning models}: No quirk of deep networks, but a general property of machine learners
+    \item \textbf{Subtle and imperceptible perturbations}: mathematically small under a chosen norm / visually imperceptible to humans
+    \item \textbf{Produces an incorrect predition}: The machine learner is fooled where the human would not have been
   \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Jacobian-Based Dataset Augmentation}
-  \framesubtitle{Papernot et al., 2017}
+\frametitle{Measuring ``small'': the $\ell_p$ norms}
 
-  \taxobox{Black-box}{Evasion}{???}{???}
+\vfill
+\centering
+\includegraphics[width=0.95\textwidth, height=0.62\textheight, keepaspectratio]{norms.png}
 
-  \begin{itemize}
-    \item Use target model as an oracle to label samples 
-    \item Strategy for sample selection is necessary
-    \item Idea: iteratively add meaningful samples to dataset
-    \item Use Jacobian for a heuristic
-  \end{itemize}
+\vskip12pt
+Norm defines the \textbf{perturbation budget $\epsilon$}.
+\vfill
 \end{frame}
 
 \begin{frame}
-  \frametitle{Heuristic for meaningful directions}
-  \framesubtitle{Papernot et al., 2017}
+  \frametitle{Carlini \& Wagner}
+  \framesubtitle{Carlini \& Wagner, 2017}
 
-  \taxobox{Black-box}{Evasion}{???}{???}
+  \taxobox{White-box}{Evasion}{Targeted}
 
   \begin{block}{}
     \begin{align*}
-      x = x + \alpha \cdot sign(J_f(x)[o(x)])
+      \underbrace{\min_{\delta}\; c\,\|\delta\|_2 + L_f(x+\delta,\, t)}_{\text{L-BFGS}}
+      \qquad\longrightarrow\qquad
+      \underbrace{\min_{\delta}\; \|\delta\|_p + c\cdot \ell(x+\delta)}_{\text{C\&W}}
     \end{align*}
   \end{block}
 
-
   \begin{itemize}
-    \item \(J_f(x)\): total derivative
-    \item \(J_f(x)[o(x)]\): total derivative, column of the correct label
-    \item[$\leadsto$] We move into the class region (according to the substitute)!
+    \item $\;\ell(x') = \max\!\big(\max_{i\neq t} z_i(x') - z_t(x'),\; 0\big)$
+    \item Built so that $\ell(x') \le 0 \iff$ input is classified as $t$ $\rightarrow$ faithfully encodes the attack goal
+    \item $c$ decided through \textbf{binary search}
   \end{itemize}
 \end{frame}
 
 \begin{frame}
-  \frametitle{Jacobian-Based Dataset Augmentation}
-  \framesubtitle{Papernot et al., 2017}
+  \frametitle{Carlini \& Wagner}
+  \framesubtitle{Carlini \& Wagner, 2017}
 
-  \taxobox{Black-box}{Evasion}{???}{???}
+  \taxobox{White-box}{Evasion}{Targeted}
+
+  \begin{block}{}
+    \begin{align*}
+      x' = \tfrac{1}{2}\big(\tanh(w) + 1\big),
+      \qquad w \in \mathbb{R}^m
+    \end{align*}
+  \end{block}
 
   \begin{itemize}
-    \item 1) collect samples somewhat related to the input domain
-    \item 2) choose architecture for substitute
-    \item 3) target model labels current samples
-    \item 4) train substitute
-    \item 5) expand dataset: \( S_{N+1} := \{x = x + \alpha \cdot sign(J_f(x)[o(x)]) \mid x \in S_N\} \cup S_N\)
-    \item repeat (3) onwards
+    \item Mapping any $w \in \mathbb{R}^m$ into $(0,1)^m$ $\rightarrow$ every $w$
+          decodes to a \textbf{valid image} $\rightarrow$ dissolving box-constraint
+    \item Optimise $w$ \textbf{unconstrained} with Adam optimiser
   \end{itemize}
+
+  \begin{significance}
+    \item Strongest attack of its time across $\ell_0 / \ell_2 / \ell_\infty$
+    \item Broke \emph{defensive distillation}, exposing it as \emph{gradient masking}
+  \end{significance}
 \end{frame}
 
+\begin{frame}[c]
+  \frametitle{Physical adversarial attacks}
 
+  \vfill
+  \begin{columns}[c]
+    % two portrait-format images side by side
+    \column{0.34\textwidth}
+    \centering
+    \includegraphics[height=3.7cm]{adversarial-glasses.png}\hfill
+    \includegraphics[height=3.7cm]{adversarial-t-shirt.png}\\[3pt]
+    {\tiny\refer{Sharif et al., 2016 \quad$\cdot$\quad Xu et al., 2020}}
+
+    % two wide-format images stacked
+    \column{0.62\textwidth}
+    \centering
+    \includegraphics[width=0.96\linewidth]{adversarial-stickers-on-stop-signs.png}\\[2pt]
+    {\tiny\refer{Eykholt et al., 2018}}\\[7pt]
+    \includegraphics[width=0.96\linewidth]{adversarial-turtle.png}\\[2pt]
+    {\tiny\refer{Athalye et al., 2018}}
+  \end{columns}
+\end{frame}
 
 \begin{frame}
   \frametitle{Poison Frogs}
 
-  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}
 
   \begin{itemize}
     \item Goal: get ML model to misclassify one specific sample \(v\) into target class \(t\)
     \item Assumption: model based on pretrained weights known to the attacker, access to data distribution
     \item Restriction: adversary cannot choose labels
-    \item -> "clean-label attack"
+    \item -> "Clean-label attack"
   \end{itemize}
   
 \end{frame}
@@ -995,7 +1014,7 @@ Taken from [!!!].
 \begin{frame}
   \frametitle{Poison Frogs: poison instances}
 
-  \taxobox{Black-box}{Evasion}{Targ./Untarg.}{???}
+  \taxobox{Black-box}{Evasion}{Targ./Untarg.}
 
   \begin{itemize}
     \item Sample instance \(b\) of target class \(t\)
@@ -1009,22 +1028,9 @@ Taken from [!!!].
 
   \begin{itemize}
     \item \(g\): feature representation (second-to-last layer output)
-    \item keep \(x\) close to \(v\) in feature space, but close to \(b\) in pixel space
+    \item Keep \(x\) close to \(v\) in feature space, but close to \(b\) in pixel space
   \end{itemize}
   
-\end{frame}
-
-
-
-
-\appendix
-% ==========================================================================
-% REFERENCES
-% ==========================================================================
-
-\begin{frame}[allowframebreaks]
-  \frametitle{References}
-  \printbibliography[heading=none]
 \end{frame}
 
 \end{document}
