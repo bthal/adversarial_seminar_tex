@@ -325,10 +325,9 @@
   \frametitle{Do Neural Networks behave linearly?}
   \framesubtitle{\cite{goodfellow2014explaining}}
 
-  %\taxobox{White-box}{Evasion}{Targeted}
-  \begin{block}{}
-    ...
-  \end{block}
+  \vfill
+  \centering
+  \includegraphics[width=0.95\textwidth, height=0.7\textheight, keepaspectratio]{activation_functions.png}
 \end{frame}
 
 
@@ -688,12 +687,25 @@
 
   \begin{itemize}
     \item Goal: get ML model to misclassify any sample with trigger pattern into target class \(t\)
-    \item Similar threat model to Poison Frogs
+    \item Assumption: model based on pretrained weights known to the attacker, access to data distribution
     \item Restriction: adversary cannot choose labels
     \item -> "Clean-label attack"
   \end{itemize}
   
 \end{frame}
+
+\begin{frame}
+\frametitle{Hidden Trigger Backdoor Attack: The approach}
+
+\vfill
+\centering
+\includegraphics[width=0.95\textwidth, height=0.62\textheight, keepaspectratio]{HTBA_process.png}
+
+\vskip12pt
+Taken from [!!!].
+\vfill
+\end{frame}
+
 
 \begin{frame}
   \frametitle{Hiding the trigger}
@@ -714,6 +726,49 @@
   \begin{itemize}
     \item \(g\): feature representation (second-to-last layer output)
     \item Keep \(x\) close to \(\tilde{s}\) in feature space, but close to \(b\) in pixel space
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Narcissus}
+
+  \taxobox{Black-box}{???}{}{???}
+
+  \begin{itemize}
+    \item Goal: get ML model to misclassify any sample with trigger pattern into target class \(t\)
+    \item Assumption: no access to model or data distribution
+    \item But: Access to "public out of distribution" data \(D_{POOD}\), target class examples \(D_t\)
+    \item Restriction: adversary cannot choose labels ("clean-label attack")
+    \item Now: Optimise the trigger pattern!
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Narcissus}
+
+  \taxobox{Black-box}{???}{}{???}
+
+  \begin{itemize}
+    \item Assume oracle \(f_{orc}\), which is the victim's model without poisoning
+    \item Choose trigger to maximise oracle's confidence on target class: \(\delta^{*} = \arg\min_{\delta\in S}{\sum_{(x,t)\in D_t}{L_{f_{orc}}(x+\delta, t)}}\)
+    \item Trigger now is related to the target class!
+    \item However: No access to \(f_{orc}\)
+  \end{itemize}
+  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Narcissus}
+
+  \taxobox{Black-box}{???}{}{???}
+
+  \begin{itemize}
+    \item Train surrogate \(f_{sur}\) on \(D_{POOD}\), \(D_t\)
+    \item Use PGD to find \(\delta^{*} = \arg\min_{\delta\in S}{\sum_{(x,t)\in D_t}{L_{f_{sur}}(x+\delta, t)}}\)
+    \item Add trigger to portion of \(D_t\), give to victim
+    \item Exploit: Add trigger to desired input
   \end{itemize}
   
 \end{frame}
