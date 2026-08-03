@@ -314,7 +314,7 @@
   \begin{block}{}
     
   \end{block}
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item Previously: Adversarial examples assumed to be caused by 'complex' behaviour
     \item Goodfellow et al.: Linear models have adversarial examples as well
     \item[$\leadsto$] Models may be too linear
@@ -356,7 +356,7 @@
 
   \taxobox{White-box}{Evasion}{Untargeted}
   
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item Linearise the loss function:
     \begin{block}{}
     \[
@@ -387,7 +387,7 @@
 
   \taxobox{White-box}{Evasion}{Untargeted}
   
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item Much faster than L-BFGS: Single step only
     \item[$\leadsto$] Made adversarial training feasible
     \item Introduced different way of thinking about adversarial examples
@@ -410,7 +410,7 @@
     \max_{\delta\in S}L_f(x+\delta, y)
     \]
   \end{block}
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item FGSM: Use \(S=\{\delta \mid \lVert \delta \rVert_\infty \leq \epsilon\}\)
     \item Use projected gradient descent to optimise
   \end{itemize}
@@ -421,7 +421,7 @@
   \framesubtitle{\cite{madry2017towards}}
 
   \taxobox{White-box}{Evasion}{Untargeted}
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item Random runs show different maxima, but similar loss values
     \item[$\leadsto$] If better solution exists: difficult to find using first-order methods
     \item Especially relevant for adversarial defenses
@@ -485,7 +485,7 @@
 \begin{frame}
   \frametitle{Transfer attacks}
 
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item Black-box attack pattern
     \item Adversary creates and trains a substitute model for the target
     \item Adversarial examples for substitute model are found (white-box!)
@@ -500,7 +500,7 @@
 
   \taxobox{Black-box}{Evasion}{-}
 
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item Assumption: No knowledge of model parameters, dataset 
     \linebreak Access to somewhat representative inputs is granted (e.g. natural images) 
     \item How do we construct a suitable substitute? (similar decision boundaries)
@@ -514,7 +514,7 @@
 
   \taxobox{Black-box}{Evasion}{-}
 
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item Use target model as an oracle to label samples 
     \item Strategy for sample selection is necessary
     \item Idea: iteratively add meaningful samples to dataset
@@ -548,7 +548,7 @@
 
   \taxobox{Black-box}{Evasion}{-}
 
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item 1) Collect samples somewhat related to the input domain
     \item 2) Choose architecture for substitute
     \item 3) Target model labels current samples
@@ -567,9 +567,9 @@
   \framesubtitle{\cite{chen2017zoo}}
   \taxobox{Black-box}{Evasion}{Targ./Untarg.}
 
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item Black-box attack without substitute model
-    \item No quality loss due to transfer
+    \item[$\leadsto$] No quality loss due to transfer
     \item Assumptions: Adversary allowed to query, gets confidence scores
   \end{itemize}
 \end{frame}
@@ -586,7 +586,7 @@
     \end{align*}
   \end{block}
 
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item \(l\) loss function based on confidence scores
     \item Two queries per coordinate, full gradient infeasible
     \item[$\leadsto$] Coordinate descent% using first and/or second-order method
@@ -606,7 +606,7 @@
   \framesubtitle{\cite{saha2020hidden}}
   \taxobox{White-box}{Poisoning}{Targeted}
 
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item Goal: get ML model to misclassify any sample with trigger pattern into target class \(t\)
     \item Assumption: model based on pretrained weights known to the attacker, access to data distribution
     \item Restriction: adversary cannot choose labels ("Clean-label attack")
@@ -643,7 +643,7 @@ Taken from \cite{saha2020hidden}.
     \end{align*}
   \end{block}
 
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item \(g\): feature representation (second-to-last layer output)
     \item Keep \(x\) close to \(\tilde{s}\) in feature space, but close to \(b\) in pixel space
   \end{itemize}
@@ -657,7 +657,7 @@ Taken from \cite{saha2020hidden}.
   \framesubtitle{\cite{zeng2023narcissus}}
   \taxobox{Black-box}{Poisoning}{Targeted}
 
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item Goal: get ML model to misclassify any sample with trigger pattern into target class \(t\)
     \item Assumption: no access to model or data distribution
     \item But: Access to "public out of distribution" data \(D_{POOD}\), target class examples \(D_t\)
@@ -672,7 +672,7 @@ Taken from \cite{saha2020hidden}.
   \framesubtitle{\cite{zeng2023narcissus}}
   \taxobox{Black-box}{Poisoning}{Targeted}
 
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item Assume oracle \(f_{orc}\), which is the victim's model without poisoning
     \item Choose trigger to maximise oracle's confidence on target class: \(\delta^{*} = \arg\min_{\delta\in S}{\sum_{(x,t)\in D_t}{L_{f_{orc}}(x+\delta, t)}}\)
     \item Trigger now is related to the target class!
@@ -686,7 +686,7 @@ Taken from \cite{saha2020hidden}.
   \framesubtitle{\cite{zeng2023narcissus}}
   \taxobox{Black-box}{Poisoning}{Targeted}
 
-  \begin{itemize}
+  \begin{itemize}[<+->]
     \item Train surrogate \(f_{sur}\) on \(D_{POOD}\), \(D_t\)
     \item Use PGD to find \(\delta^{*} = \arg\min_{\delta\in S}{\sum_{(x,t)\in D_t}{L_{f_{sur}}(x+\delta, t)}}\)
     \item Add trigger to portion of \(D_t\), give to victim
