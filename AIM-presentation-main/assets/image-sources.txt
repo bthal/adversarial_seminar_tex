@@ -10,3 +10,10 @@ svm https://miro.medium.com/v2/resize:fit:1358/1*TSjvQlDde90FQtoD9-9iHw.png
 decision-tree https://365datascience.com/resources/blog/rr6cuudl59r-decision-trees-image1.png
 dnn https://ekababisong.org/assets/demyst_dl/neural-network.jpg
 kNN https://serokell.io/files/un/unzg7l97.K-Nearest_Neighbors_pic9.png
+
+dataset-robust-removed  cropped from adversarial_dataset.png (Ilyas et al. 2019, Fig. 2); middle row (D-hat_R) removed
+
+adversarial-stickers-on-stop-signs Eykholt et al. 2018 -> Robust Physical-World Attacks on Deep Learning Visual Classification
+adversarial-t-shirt Xu et al. 2020 -> Adversarial T-shirt! Evading Person Detectors in A Physical World
+adversarial-glasses Sharif et al. 2016 -> Accessorize to a Crime: Real and Stealthy Attacks on State-of-the-Art Face Recognition
+adversarial-turtle Athalye et al. 2018 -> Synthesizing Robust Adversarial Examples
